@@ -35,7 +35,7 @@
     body { font-family: 'Inter', sans-serif; background-color: #f0f4f8; color: #1e293b; }
     .status-pill { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; }
     .status-green { background-color: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, 0.5); }
-    .status-yellow { background-color: #eab308; box-shadow: 0 0 6px rgba(234, 179, 8, 0.5); }
+    .status-yellow { background-color: #eab308; box-shadow: 0 0 6px rgba(245, 158, 11, 0.5); }
     .status-red { background-color: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.5); }
     
     /* Cores de células de desempenho (estilo foto) */
@@ -58,10 +58,10 @@
       </div>
       <div>
         <div class="flex items-center gap-2">
-          <h1 class="text-lg font-bold tracking-tight text-white">Painel Gerencial de Desempenho SPI • Coordenação</h1>
+          <h1 class="text-lg font-bold tracking-tight text-white">CONTRATO VIVO - REDE ACESSO SPI (FIXA E MÓVEL)</h1>
           <span class="bg-sky-500/20 text-sky-300 text-xs px-2.5 py-0.5 rounded font-medium border border-sky-500/30">Google Sheets Live</span>
         </div>
-        <p class="text-xs text-slate-300 mt-0.5">CONTRATO VIVO - REDE ACESSO SPI (FIXA E MÓVEL)</p>
+        <p class="text-xs text-slate-300 mt-0.5">Painel Gerencial de Desempenho • Acompanhamento por DDD e Coordenador</p>
       </div>
     </div>
 
@@ -69,7 +69,7 @@
     <div class="flex items-center gap-3">
       <div class="text-right hidden sm:block">
         <p class="text-[10px] text-slate-300 uppercase tracking-wider font-semibold">Última sincronização</p>
-        <p class="text-xs font-bold text-slate-100" id="clock-timestamp">15:25</p>
+        <p class="text-xs font-bold text-slate-100" id="clock-timestamp">--:--</p>
       </div>
 
       <select id="select-semana" onchange="filterBySemana()" class="bg-slate-800 border border-slate-700 text-sky-300 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
@@ -98,13 +98,13 @@
     </div>
   </div>
 
-  <!-- BLOCO 1: PAINEL GERAL SPI (LARGURA TOTAL CONFORME FOTO) -->
+  <!-- BLOCO 1: PAINEL GERAL SPI (LARGURA TOTAL) -->
   <section class="bg-white rounded-xl border border-slate-200/90 shadow-sm overflow-hidden p-4">
     <div class="flex items-center justify-between pb-3 border-b border-slate-200">
       <div class="flex items-center gap-2">
         <div class="w-2 h-4 bg-[#0b2341] rounded-sm"></div>
         <h2 class="text-xs font-bold uppercase tracking-wider text-[#0b2341]" id="lbl-titulo-desempenho">
-          DESEMPENHO POR DDD (SEMANA: 14/2026)
+          DESEMPENHO POR DDD (SEMANA: --)
         </h2>
       </div>
       <span class="text-xs font-bold text-sky-800 bg-sky-50 border border-sky-200 px-3 py-1 rounded-md" id="lbl-semana-t1">
@@ -116,7 +116,6 @@
     <div class="overflow-x-auto mt-3">
       <table class="w-full text-center border-collapse text-xs">
         <thead>
-          <!-- Nível 1 de Cabeçalho: Agrupadores dos Indicadores -->
           <tr class="bg-[#0b2341] text-white font-bold uppercase text-[10px] tracking-wider border-b border-slate-700">
             <th class="p-2 border-r border-slate-700/60 text-left" rowspan="2">DDD</th>
             <th class="p-2 border-r border-slate-700/60 text-left" rowspan="2">Regional</th>
@@ -131,7 +130,6 @@
             <th class="p-2 border-r border-slate-700/60" rowspan="2">Ranking<br>DDD</th>
             <th class="p-2" rowspan="2">Status</th>
           </tr>
-          <!-- Nível 2 de Cabeçalho: Subcolunas de Resultado e Pts -->
           <tr class="bg-[#123358] text-slate-200 font-semibold text-[9px] uppercase tracking-wider border-b border-slate-300">
             <th class="p-1 border-r border-slate-600/50">Resultado</th>
             <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
@@ -255,7 +253,7 @@
       <!-- Evolução e Ações -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80">
-          <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2">EVOLUÇÃO HISTÓRICA</h4>
+          <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2">EVOLUÇÃO HISTÓRICA (ÚLTIMAS 5 SEMANAS)</h4>
           <div class="h-28 relative">
             <canvas id="chart-evolucao-coord"></canvas>
           </div>
@@ -330,7 +328,7 @@
       <!-- Evolução e Ações -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80">
-          <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2">EVOLUÇÃO SEMANAL</h4>
+          <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2">EVOLUÇÃO SEMANAL (ÚLTIMAS 5 SEMANAS)</h4>
           <div class="h-28 relative">
             <canvas id="chart-evolucao-ddd"></canvas>
           </div>
@@ -347,7 +345,7 @@
 
   </section>
 
-  <!-- JAVASCRIPT: PROCESSAMENTO DAS SUBCOLUNAS E RENDERIZAÇÃO DA TABELA EXPANDIDA -->
+  <!-- JAVASCRIPT: LÓGICA DINÂMICA PARA CAPTURA DAS ÚLTIMAS 5 SEMANAS DA BASE -->
   <script>
     const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vShU66oSm1Q0GBrBINsiaCR64uGW_mP2MLPckpcjyZmjwDJFSaXiamg_D-mGQTlQ7WGmJjcR-CkZCD_/pub?gid=796515673&single=true&output=csv';
 
@@ -355,6 +353,7 @@
     let dddDataFiltered = [];
     let coordenadoresData = [];
     let selectedSemana = '';
+    let ultimas5Semanas = [];
 
     let chartFaixaNotasInst = null;
     let chartEvolucaoCoordInst = null;
@@ -378,6 +377,7 @@
         complete: function(results) {
           if (results.data && results.data.length > 0) {
             allRowsParsed = processRawRows(results.data);
+            extractUltimas5Semanas();
             populateSemanaSelector();
             filterBySemana();
             
@@ -423,7 +423,6 @@
         const regional = getVal(['Regional', 'Praça', 'Praca']) || 'Regional';
         const coordenador = getVal(['Coordenador']) || 'Não informado';
 
-        // Resultados Brutos das Colunas da Foto
         const p1Real = getVal(['P1 Real', 'P1 Resultado']) || '0%';
         const p2Real = getVal(['P2 Real', 'P2 Resultado']) || '0%';
         const prevExecReal = getVal(['Prev. Exec. (%)', 'Exec. Resultado', 'Exec. (%)']) || '0%';
@@ -434,7 +433,6 @@
         const gastoHE = getVal(['Gasto Real HE', 'Realizado']) || 'R$ 0';
         const varHE = getVal(['Var. vs Orçamento', 'Variação', 'Variacao']) || '0%';
 
-        // Pontos Computados
         const ptsP1 = parseNum(getVal(['Pts P1', 'P1 (30)', 'P1 Pts']));
         const ptsP2 = parseNum(getVal(['Pts P2', 'P2 (10)', 'P2 Pts']));
         const ptsExec = parseNum(getVal(['Pts Exec', 'Exec (5)', 'Exec Pts']));
@@ -454,9 +452,31 @@
       });
     }
 
+    // ANALISA A PLANILHA E CAPTURA AS ÚLTIMAS 5 SEMANAS EXISTENTES
+    function extractUltimas5Semanas() {
+      // Extrai semanas únicas e ordena numericamente/cronologicamente
+      const semanasUnicas = [...new Set(allRowsParsed.map(r => r.semana))].filter(Boolean);
+      
+      semanasUnicas.sort((a, b) => {
+        const numA = parseInt(a.split('/')[0]) || 0;
+        const numB = parseInt(b.split('/')[0]) || 0;
+        return numA - numB;
+      });
+
+      // Pega somente as últimas 5 semanas existentes
+      ultimas5Semanas = semanasUnicas.slice(-5);
+    }
+
     function populateSemanaSelector() {
       const sel = document.getElementById('select-semana');
       const semanas = [...new Set(allRowsParsed.map(r => r.semana))].filter(Boolean);
+      
+      semanas.sort((a, b) => {
+        const numA = parseInt(a.split('/')[0]) || 0;
+        const numB = parseInt(b.split('/')[0]) || 0;
+        return numA - numB;
+      });
+
       sel.innerHTML = '';
       semanas.forEach(s => {
         const opt = document.createElement('option');
@@ -536,7 +556,6 @@
       });
     }
 
-    // RENDERIZAR TABELA 1 EXPANDIDA (CÓPIA FIEL DA IMAGEM)
     function renderTabelaSemanal() {
       const tbody = document.getElementById('tbody-ddd-semanal');
       tbody.innerHTML = '';
@@ -549,7 +568,6 @@
         if (d.total < 70) statusClass = "status-red";
         else if (d.total < 85) statusClass = "status-yellow";
 
-        // Estilos de destaque para células boas vs ruins conforme foto
         const getCellClass = (pts, max) => pts === max ? 'cell-good' : (pts === 0 ? 'cell-bad' : 'cell-neutral');
 
         tr.innerHTML = `
@@ -557,33 +575,26 @@
           <td class="p-2 text-left text-slate-700 border-r border-slate-200/60">${d.regional}</td>
           <td class="p-2 text-left font-bold text-slate-900 border-r border-slate-200/60">${d.coordenador}</td>
           
-          <!-- P1 -->
           <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsP1, 30)}">${d.p1Real}</td>
           <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsP1, 30)}">${d.ptsP1}</td>
           
-          <!-- P2 -->
           <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsP2, 10)}">${d.p2Real}</td>
           <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsP2, 10)}">${d.ptsP2}</td>
           
-          <!-- Prev. Exec -->
           <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsExec, 5)}">${d.prevExecReal}</td>
           <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsExec, 5)}">${d.ptsExec}</td>
           
-          <!-- Prev. Qual -->
           <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsQual, 5)}">${d.prevQualReal}</td>
           <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsQual, 5)}">${d.ptsQual}</td>
           
-          <!-- Fatura B -->
           <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsFatB, 20)}">${d.faturaBReal}</td>
           <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsFatB, 20)}">${d.ptsFatB}</td>
           
-          <!-- HE + Sob -->
           <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsHESob, 30)}">${d.orcHE}</td>
           <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsHESob, 30)}">${d.gastoHE}</td>
           <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsHESob, 30)}">${d.varHE}</td>
           <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsHESob, 30)}">${d.ptsHESob}</td>
           
-          <!-- Total & Status -->
           <td class="p-2 font-extrabold text-slate-900 bg-slate-100/90 text-sm border-r border-slate-200/60">${d.total.toFixed(0)}</td>
           <td class="p-2 font-bold text-slate-700 border-r border-slate-200/60">${d.rankingDDD}º</td>
           <td class="p-2"><span class="status-pill ${statusClass}"></span></td>
@@ -688,20 +699,30 @@
         tbody.appendChild(tr);
       });
 
+      // GRÁFICO DINÂMICO DA EVOLUÇÃO DO COORDENADOR (ÚLTIMAS 5 SEMANAS DA BASE)
+      const chartLabelsCoord = ultimas5Semanas.map(s => `Sem ${s.split('/')[0]}`);
+      const chartDataCoord = ultimas5Semanas.map(sem => {
+        const rowsSemana = allRowsParsed.filter(r => r.semana === sem && r.coordenador === coordObj.coordenador);
+        if (rowsSemana.length === 0) return null;
+        const soma = rowsSemana.reduce((acc, curr) => acc + curr.total, 0);
+        return (soma / rowsSemana.length).toFixed(1);
+      });
+
       const ctx = document.getElementById('chart-evolucao-coord').getContext('2d');
       if (chartEvolucaoCoordInst) chartEvolucaoCoordInst.destroy();
 
       chartEvolucaoCoordInst = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ['Sem 10', 'Sem 11', 'Sem 12', 'Sem 13', `Sem ${selectedSemana.split('/')[0] || '14'}`],
+          labels: chartLabelsCoord,
           datasets: [{
             label: 'Nota Coordenação',
-            data: [coordObj.notaFinal - 6, coordObj.notaFinal - 4, coordObj.notaFinal - 2, coordObj.notaFinal - 1, coordObj.notaFinal],
+            data: chartDataCoord,
             borderColor: '#0284c7',
             backgroundColor: 'rgba(2, 132, 199, 0.1)',
             fill: true,
-            tension: 0.3
+            tension: 0.3,
+            spanGaps: true
           }]
         },
         options: {
@@ -709,7 +730,7 @@
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { min: 40, max: 100, grid: { color: '#f1f5f9' }, ticks: { color: '#64748b', font: { size: 9 } } },
+            y: { min: 20, max: 100, grid: { color: '#f1f5f9' }, ticks: { color: '#64748b', font: { size: 9 } } },
             x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } }
           }
         }
@@ -772,20 +793,28 @@
         tbody.appendChild(tr);
       });
 
+      // GRÁFICO DINÂMICO DA EVOLUÇÃO SEMANAL DO DDD (ÚLTIMAS 5 SEMANAS DA BASE)
+      const chartLabelsDDD = ultimas5Semanas.map(s => `Sem ${s.split('/')[0]}`);
+      const chartDataDDD = ultimas5Semanas.map(sem => {
+        const itemSemana = allRowsParsed.find(r => r.semana === sem && r.ddd === dddObj.ddd);
+        return itemSemana ? itemSemana.total : null;
+      });
+
       const ctx = document.getElementById('chart-evolucao-ddd').getContext('2d');
       if (chartEvolucaoDDDInst) chartEvolucaoDDDInst.destroy();
 
       chartEvolucaoDDDInst = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ['Sem 10', 'Sem 11', 'Sem 12', 'Sem 13', `Sem ${selectedSemana.split('/')[0] || '14'}`],
+          labels: chartLabelsDDD,
           datasets: [{
             label: 'Evolução DDD',
-            data: [dddObj.total - 10, dddObj.total - 7, dddObj.total - 4, dddObj.total - 2, dddObj.total],
+            data: chartDataDDD,
             borderColor: '#6366f1',
             backgroundColor: 'rgba(99, 102, 241, 0.1)',
             fill: true,
-            tension: 0.3
+            tension: 0.3,
+            spanGaps: true
           }]
         },
         options: {
