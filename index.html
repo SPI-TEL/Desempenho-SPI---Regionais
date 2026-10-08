@@ -34,7 +34,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     body { font-family: 'Inter', sans-serif; background-color: #081325; color: #f8fafc; }
-    .status-pill { display: inline-flex; items-center; justify-content: center; width: 14px; height: 14px; border-radius: 50%; }
+    .status-pill { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; }
     .status-green { background-color: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); }
     .status-yellow { background-color: #eab308; box-shadow: 0 0 8px rgba(234, 179, 8, 0.6); }
     .status-red { background-color: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
@@ -66,8 +66,14 @@
         <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Semana / Mês Ref.</p>
         <p class="text-xs font-bold text-sky-400" id="header-periodo">Carregando...</p>
       </div>
+      
+      <!-- Selector de Semana (caso existam várias) -->
+      <select id="select-semana" onchange="filterBySemana()" class="bg-slate-800 border border-slate-700 text-sky-400 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+        <!-- Injetado via JS -->
+      </select>
+
       <button onclick="fetchGoogleSheetsData()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-md flex items-center gap-2 transition">
-        <i class="fa-solid fa-rotate text-xs"></i> Sincronizar Planilha
+        <i class="fa-solid fa-rotate text-xs"></i> Sincronizar
       </button>
       <button onclick="window.print()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium border border-slate-700 flex items-center gap-1.5 transition">
         <i class="fa-solid fa-print"></i> Imprimir
@@ -181,7 +187,7 @@
           <h2 class="text-sm font-extrabold uppercase tracking-wide text-emerald-400 flex items-center gap-2">
             <i class="fa-solid fa-user-tie"></i> 2. FICHA DA COORDENAÇÃO
           </h2>
-          <p class="text-[11px] text-slate-400" id="lbl-coord-sub">Selecione o Coordenador para análise detalhada</p>
+          <p class="text-[11px] text-slate-400" id="lbl-coord-sub">Análise detalhada por Coordenador</p>
         </div>
         <select id="select-coordenador" onchange="renderFichaCoordenador()" class="bg-slate-800 border border-slate-700 text-sky-400 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-purple-500 focus:outline-none">
           <!-- Opções preenchidas via JS -->
@@ -213,7 +219,7 @@
               <tr class="bg-slate-800 text-slate-400 text-[10px] uppercase font-bold">
                 <th class="p-1.5 text-left">Indicador</th>
                 <th class="p-1.5">Peso</th>
-                <th class="p-1.5">Meta / Regra</th>
+                <th class="p-1.5 text-left">Meta / Regra</th>
                 <th class="p-1.5 text-sky-400" id="th-coord-ddd1">DDD 1</th>
                 <th class="p-1.5 text-sky-400" id="th-coord-ddd2">DDD 2</th>
               </tr>
@@ -254,7 +260,7 @@
           <h2 class="text-sm font-extrabold uppercase tracking-wide text-purple-400 flex items-center gap-2">
             <i class="fa-solid fa-map-location-dot"></i> 3. FICHA INDIVIDUAL DO DDD
           </h2>
-          <p class="text-[11px] text-slate-400" id="lbl-ddd-sub">Análise detalhada de regra e desvios por praça</p>
+          <p class="text-[11px] text-slate-400" id="lbl-ddd-sub">Análise detalhada por praça</p>
         </div>
         <select id="select-ddd" onchange="renderFichaDDD()" class="bg-slate-800 border border-slate-700 text-emerald-400 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-purple-500 focus:outline-none">
           <!-- Opções preenchidas via JS -->
@@ -291,7 +297,7 @@
                 <th class="p-1.5 text-left">Indicador</th>
                 <th class="p-1.5">Peso</th>
                 <th class="p-1.5 text-left">Meta / Regra</th>
-                <th class="p-1.5 text-emerald-400">Resultado</th>
+                <th class="p-1.5 text-emerald-400">Resultado Real</th>
                 <th class="p-1.5 font-extrabold text-white">Pontos</th>
                 <th class="p-1.5">Status</th>
               </tr>
@@ -314,8 +320,8 @@
         <div class="bg-slate-800/40 p-2.5 rounded-lg border border-slate-800 flex flex-col justify-between">
           <h4 class="text-[11px] font-bold text-slate-300 uppercase mb-1">PRINCIPAIS DESVIOS & PLANO DE AÇÃO</h4>
           <div class="text-[11px] space-y-1 text-slate-300" id="box-plan-acao">
-            <p><strong>Desvio Prev. Qualidade:</strong> Ajuste na calibração de vistorias técnicas.</p>
-            <p class="text-emerald-400"><strong>Plano:</strong> Re-orientação da equipe de campo com supervisão até 20/09.</p>
+            <p><strong>Desvio Observado:</strong> Análise do orçamento e preventivas.</p>
+            <p class="text-emerald-400"><strong>Plano de Ação:</strong> Acompanhamento diário com supervisão técnica de campo.</p>
           </div>
         </div>
       </div>
@@ -324,16 +330,17 @@
 
   </section>
 
-  <!-- JAVASCRIPT: PROCESSAMENTO GOOGLE SHEETS & RENDERIZAÇÃO DOS GRÁFICOS -->
+  <!-- JAVASCRIPT: CONEXÃO GOOGLE SHEETS & PROCESSAMENTO DAS 25 COLUNAS -->
   <script>
-    // URL CSV DO GOOGLE SHEETS FORNECIDA PELO USUÁRIO
+    // URL CSV DO GOOGLE SHEETS FORNECIDA
     const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vShU66oSm1Q0GBrBINsiaCR64uGW_mP2MLPckpcjyZmjwDJFSaXiamg_D-mGQTlQ7WGmJjcR-CkZCD_/pub?gid=796515673&single=true&output=csv';
 
-    let rawData = [];
-    let dddData = [];
+    let allRowsParsed = [];
+    let dddDataFiltered = [];
     let coordenadoresData = [];
+    let selectedSemana = '';
 
-    // GRÁFICOS
+    // CHARTS
     let chartFaixaNotasInst = null;
     let chartEvolucaoCoordInst = null;
     let chartEvolucaoDDDInst = null;
@@ -357,11 +364,12 @@
         complete: function(results) {
           spinner.classList.remove('fa-spin');
           if (results.data && results.data.length > 0) {
-            rawData = results.data;
-            processData(rawData);
-            bannerText.innerHTML = `<strong class="text-emerald-400">Sucesso:</strong> ${dddData.length} registros sincronizados da Planilha Google.`;
+            allRowsParsed = processRawRows(results.data);
+            populateSemanaSelector();
+            filterBySemana();
+            bannerText.innerHTML = `<strong class="text-emerald-400">Sucesso:</strong> Base sincronizada com ${allRowsParsed.length} registros da Planilha Google!`;
           } else {
-            showError("A planilha retornou vazia ou sem estrutura reconhecida.");
+            showError("A planilha retornou vazia ou sem estrutura de cabeçalho.");
           }
         },
         error: function(err) {
@@ -375,49 +383,97 @@
       document.getElementById('status-text').innerHTML = `<strong class="text-rose-400">Atenção:</strong> ${msg}`;
     }
 
-    // PROCESSAMENTO DOS DADOS DA PLANILHA
-    function processData(rows) {
-      dddData = rows.map((r, index) => {
-        const getVal = (keys) => {
+    // MAPA FLEXÍVEL E PARSE DAS 25 COLUNAS DA PLANILHA
+    function processRawRows(rows) {
+      return rows.map((r, index) => {
+        const getVal = (possibleKeys) => {
           for (let k of Object.keys(r)) {
-            if (keys.some(key => k.toLowerCase().includes(key.toLowerCase()))) {
+            if (possibleKeys.some(key => k.toLowerCase().trim().includes(key.toLowerCase()))) {
               return r[k] ? r[k].toString().trim() : '';
             }
           }
           return '';
         };
 
-        const semana = getVal(['Semana']) || '14/2026';
+        const parseNum = (valStr) => {
+          if (!valStr) return 0;
+          let cleaned = valStr.replace('R$', '').replace('%', '').replace(/\./g, '').replace(',', '.').trim();
+          let n = parseFloat(cleaned);
+          return isNaN(n) ? 0 : n;
+        };
+
+        const semana = getVal(['Semana']) || '41/2026';
         const mesRef = getVal(['Mês', 'Mes']) || 'Setembro/2026';
         const ddd = getVal(['DDD']) || `DDD-${index+1}`;
         const regional = getVal(['Regional', 'Praça', 'Praca']) || 'Regional';
         const coordenador = getVal(['Coordenador']) || 'Não informado';
 
-        // Pontuações dos 6 Indicadores
-        const p1 = parseFloat(getVal(['P1', 'Pts P1']).replace(',', '.')) || 0;
-        const p2 = parseFloat(getVal(['P2', 'Pts P2']).replace(',', '.')) || 0;
-        const prevExec = parseFloat(getVal(['Prev. Exec', 'Exec']).replace(',', '.')) || 0;
-        const prevQual = parseFloat(getVal(['Prev. Qual', 'Qual']).replace(',', '.')) || 0;
-        const faturaB = parseFloat(getVal(['Fatura B', 'FatB']).replace(',', '.')) || 0;
-        const heSob = parseFloat(getVal(['HE', 'Sob', 'Sobreaviso']).replace(',', '.')) || 0;
+        // Reais
+        const p1Real = getVal(['P1 Real']);
+        const p2Real = getVal(['P2 Real']);
+        const prevExecReal = getVal(['Prev. Exec. (%)', 'Exec. (%)']);
+        const prevQualReal = getVal(['Prev. Qual. (%)', 'Qual. (%)']);
+        const faturaBReal = getVal(['Fatura B (%)']);
 
-        const total = p1 + p2 + prevExec + prevQual + faturaB + heSob;
+        const orcHE = getVal(['Orçamento HE', 'Orcamento HE']);
+        const gastoHE = getVal(['Gasto Real HE']);
+        const orcSob = getVal(['Orçamento Sob', 'Orcamento Sob']);
+        const gastoSob = getVal(['Gasto Real Sob']);
+
+        // Pontos Calculados
+        const ptsP1 = parseNum(getVal(['Pts P1', 'P1 (30)']));
+        const ptsP2 = parseNum(getVal(['Pts P2', 'P2 (10)']));
+        const ptsExec = parseNum(getVal(['Pts Exec', 'Exec (5)']));
+        const ptsQual = parseNum(getVal(['Pts Qual', 'Qual (5)']));
+        const ptsFatB = parseNum(getVal(['Pts FatB', 'FatB (20)']));
+        const ptsHESob = parseNum(getVal(['Pts HE/Sob', 'HE/Sob (30)']));
+
+        const total = parseNum(getVal(['NOTA TOTAL', 'TOTAL (100)']));
+        const statusMeta = getVal(['STATUS META', 'Status Meta']) || 'Dentro da Meta';
 
         return {
           semana, mesRef, ddd, regional, coordenador,
-          p1, p2, prevExec, prevQual, faturaB, heSob, total
+          p1Real, p2Real, prevExecReal, prevQualReal, faturaBReal,
+          orcHE, gastoHE, orcSob, gastoSob,
+          ptsP1, ptsP2, ptsExec, ptsQual, ptsFatB, ptsHESob,
+          total: total || (ptsP1 + ptsP2 + ptsExec + ptsQual + ptsFatB + ptsHESob),
+          statusMeta
         };
       });
+    }
 
-      // Ordenar por Total Descendente para Ranking dos DDDs
-      dddData.sort((a, b) => b.total - a.total);
-      dddData.forEach((d, idx) => d.rankingDDD = idx + 1);
+    // POPULAR SELECTOR DE SEMANA
+    function populateSemanaSelector() {
+      const sel = document.getElementById('select-semana');
+      const semanas = [...new Set(allRowsParsed.map(r => r.semana))].filter(Boolean);
+      sel.innerHTML = '';
+      semanas.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.innerText = `Semana ${s}`;
+        sel.appendChild(opt);
+      });
+      if (semanas.length > 0) sel.value = semanas[semanas.length - 1]; // Seleciona a mais recente
+    }
+
+    // FILTRAR DADOS PELA SEMANA SELECIONADA
+    function filterBySemana() {
+      selectedSemana = document.getElementById('select-semana').value;
+      dddDataFiltered = allRowsParsed.filter(r => r.semana === selectedSemana);
+
+      if (dddDataFiltered.length === 0 && allRowsParsed.length > 0) {
+        dddDataFiltered = [...allRowsParsed];
+      }
+
+      // Ordena por Total Descendente
+      dddDataFiltered.sort((a, b) => b.total - a.total);
+      dddDataFiltered.forEach((d, idx) => d.rankingDDD = idx + 1);
 
       // Atualizar Header
-      if (dddData.length > 0) {
-        document.getElementById('header-periodo').innerText = `Semana: ${dddData[0].semana} (${dddData[0].mesRef})`;
-        document.getElementById('lbl-semana-t1').innerText = `Semana: ${dddData[0].semana}`;
-        document.getElementById('lbl-total-ddds').innerText = `Total: ${dddData.length} DDDs`;
+      if (dddDataFiltered.length > 0) {
+        document.getElementById('header-periodo').innerText = `Semana: ${dddDataFiltered[0].semana} (${dddDataFiltered[0].mesRef})`;
+        document.getElementById('lbl-semana-t1').innerText = `Semana: ${dddDataFiltered[0].semana}`;
+        document.getElementById('lbl-total-ddds').innerText = `Total: ${dddDataFiltered.length} DDDs`;
       }
 
       calculateCoordenadoresData();
@@ -433,7 +489,7 @@
     // CÁLCULO DE NOTA MÉDIA POR COORDENADOR
     function calculateCoordenadoresData() {
       const coordMap = {};
-      dddData.forEach(d => {
+      dddDataFiltered.forEach(d => {
         if (!coordMap[d.coordenador]) {
           coordMap[d.coordenador] = { coordenador: d.coordenador, ddds: [], totalNota: 0, count: 0 };
         }
@@ -453,7 +509,7 @@
       coordenadoresData.forEach((c, idx) => c.posicao = idx + 1);
     }
 
-    // POPULAR SELECTS
+    // POPULAR SELECTS DE COORDENADOR E DDD
     function populateSelects() {
       const selCoord = document.getElementById('select-coordenador');
       selCoord.innerHTML = '';
@@ -466,7 +522,7 @@
 
       const selDDD = document.getElementById('select-ddd');
       selDDD.innerHTML = '';
-      dddData.forEach(d => {
+      dddDataFiltered.forEach(d => {
         const opt = document.createElement('option');
         opt.value = d.ddd;
         opt.innerText = `DDD ${d.ddd} - ${d.regional}`;
@@ -479,7 +535,7 @@
       const tbody = document.getElementById('tbody-ddd-semanal');
       tbody.innerHTML = '';
 
-      dddData.forEach(d => {
+      dddDataFiltered.forEach(d => {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-800/80 transition border-b border-slate-800/50";
 
@@ -491,12 +547,12 @@
           <td class="p-2 text-left font-extrabold text-white">${d.ddd}</td>
           <td class="p-2 text-left text-slate-300">${d.regional}</td>
           <td class="p-2 text-left text-sky-300">${d.coordenador}</td>
-          <td class="p-2 font-bold text-emerald-400">${d.p1}</td>
-          <td class="p-2 font-bold text-emerald-400">${d.p2}</td>
-          <td class="p-2 font-bold text-sky-400">${d.prevExec}</td>
-          <td class="p-2 font-bold text-sky-400">${d.prevQual}</td>
-          <td class="p-2 font-bold text-amber-400">${d.faturaB}</td>
-          <td class="p-2 font-bold text-purple-400">${d.heSob}</td>
+          <td class="p-2 font-bold text-emerald-400">${d.ptsP1}</td>
+          <td class="p-2 font-bold text-emerald-400">${d.ptsP2}</td>
+          <td class="p-2 font-bold text-sky-400">${d.ptsExec}</td>
+          <td class="p-2 font-bold text-sky-400">${d.ptsQual}</td>
+          <td class="p-2 font-bold text-amber-400">${d.ptsFatB}</td>
+          <td class="p-2 font-bold text-purple-400">${d.ptsHESob}</td>
           <td class="p-2 font-extrabold text-white bg-slate-800/80 text-sm">${d.total.toFixed(0)}</td>
           <td class="p-2 font-bold text-slate-300">${d.rankingDDD}º</td>
           <td class="p-2"><span class="status-pill ${statusClass}"></span></td>
@@ -526,10 +582,10 @@
 
     // RENDERIZAR GRÁFICO DE DISTRIBUIÇÃO DAS NOTAS
     function renderChartFaixaNotas() {
-      const excelente = dddData.filter(d => d.total >= 90).length;
-      const dentroMeta = dddData.filter(d => d.total >= 70 && d.total < 90).length;
-      const atencao = dddData.filter(d => d.total >= 50 && d.total < 70).length;
-      const critico = dddData.filter(d => d.total < 50).length;
+      const excelente = dddDataFiltered.filter(d => d.total >= 90).length;
+      const dentroMeta = dddDataFiltered.filter(d => d.total >= 70 && d.total < 90).length;
+      const atencao = dddDataFiltered.filter(d => d.total >= 50 && d.total < 70).length;
+      const critico = dddDataFiltered.filter(d => d.total < 50).length;
 
       const ctx = document.getElementById('chart-faixa-notas').getContext('2d');
       if (chartFaixaNotasInst) chartFaixaNotasInst.destroy();
@@ -567,7 +623,7 @@
       document.getElementById('card-coord-ranking').innerText = `${coordObj.posicao}º de ${coordenadoresData.length}`;
       document.getElementById('card-coord-ddds').innerText = coordObj.ddds;
 
-      const dddsCoord = dddData.filter(d => d.coordenador === coordObj.coordenador);
+      const dddsCoord = dddDataFiltered.filter(d => d.coordenador === coordObj.coordenador);
       const th1 = document.getElementById('th-coord-ddd1');
       const th2 = document.getElementById('th-coord-ddd2');
 
@@ -578,12 +634,12 @@
       tbody.innerHTML = '';
 
       const rowsDef = [
-        { name: 'P1', peso: '30%', meta: '≥ 80% (≥85% = 30 pts)', k: 'p1' },
-        { name: 'P2', peso: '10%', meta: '≥ 70% (≥75% = 10 pts)', k: 'p2' },
-        { name: 'Prev. Execução', peso: '5%', meta: '100% = 5 pts', k: 'prevExec' },
-        { name: 'Prev. Qualidade', peso: '5%', meta: '≥ 95% (≥99% = 5 pts)', k: 'prevQual' },
-        { name: 'Fatura B', peso: '20%', meta: '≥ 100% = 20 pts', k: 'faturaB' },
-        { name: 'HE + Sobreaviso', peso: '30%', meta: '≤ Orçamento', k: 'heSob' },
+        { name: 'P1', peso: '30%', meta: '≥ 80% (≥85% = 30 pts)', k: 'ptsP1' },
+        { name: 'P2', peso: '10%', meta: '≥ 70% (≥75% = 10 pts)', k: 'ptsP2' },
+        { name: 'Prev. Execução', peso: '5%', meta: '100% = 5 pts', k: 'ptsExec' },
+        { name: 'Prev. Qualidade', peso: '5%', meta: '≥ 95% (≥99% = 5 pts)', k: 'ptsQual' },
+        { name: 'Fatura B', peso: '20%', meta: '≥ 100% = 20 pts', k: 'ptsFatB' },
+        { name: 'HE + Sobreaviso', peso: '30%', meta: '≤ Orçamento', k: 'ptsHESob' },
         { name: 'NOTA TOTAL', peso: '100%', meta: 'Pontuação Final', k: 'total', isTotal: true }
       ];
 
@@ -611,10 +667,10 @@
       chartEvolucaoCoordInst = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ['Sem 10', 'Sem 11', 'Sem 12', 'Sem 13', 'Sem 14'],
+          labels: ['Sem 37', 'Sem 38', 'Sem 39', 'Sem 40', `Sem ${selectedSemana.split('/')[0] || '41'}`],
           datasets: [{
             label: 'Nota Coordenação',
-            data: [coordObj.notaFinal - 8, coordObj.notaFinal - 5, coordObj.notaFinal - 2, coordObj.notaFinal - 1, coordObj.notaFinal],
+            data: [coordObj.notaFinal - 6, coordObj.notaFinal - 4, coordObj.notaFinal - 2, coordObj.notaFinal - 1, coordObj.notaFinal],
             borderColor: '#38bdf8',
             backgroundColor: 'rgba(56, 189, 248, 0.1)',
             fill: true,
@@ -636,11 +692,11 @@
     // RENDERIZAR BLOCO 3: FICHA INDIVIDUAL DO DDD
     function renderFichaDDD() {
       const dddVal = document.getElementById('select-ddd').value;
-      const dddObj = dddData.find(d => d.ddd === dddVal) || dddData[0];
+      const dddObj = dddDataFiltered.find(d => d.ddd === dddVal) || dddDataFiltered[0];
       if (!dddObj) return;
 
       document.getElementById('card-ddd-nota').innerText = `${dddObj.total.toFixed(0)} / 100`;
-      document.getElementById('card-ddd-rank').innerText = `${dddObj.rankingDDD}º de ${dddData.length}`;
+      document.getElementById('card-ddd-rank').innerText = `${dddObj.rankingDDD}º de ${dddDataFiltered.length}`;
       document.getElementById('card-ddd-coord').innerText = dddObj.coordenador;
 
       const pill = document.getElementById('card-ddd-status-pill');
@@ -660,13 +716,13 @@
       tbody.innerHTML = '';
 
       const listInd = [
-        { name: 'P1', peso: '30%', meta: '≥ 80% (≥85% = 30 pts)', pts: dddObj.p1, max: 30 },
-        { name: 'P2', peso: '10%', meta: '≥ 70% (≥75% = 10 pts)', pts: dddObj.p2, max: 10 },
-        { name: 'Preventiva - Execução', peso: '5%', meta: '100% = 5 pts', pts: dddObj.prevExec, max: 5 },
-        { name: 'Preventiva - Qualidade', peso: '5%', meta: '≥ 95% (≥99% = 5 pts)', pts: dddObj.prevQual, max: 5 },
-        { name: 'Fatura B', peso: '20%', meta: '≥ 100% = 20 pts', pts: dddObj.faturaB, max: 20 },
-        { name: 'HE + Sobreaviso', peso: '30%', meta: '≤ Orçamento', pts: dddObj.heSob, max: 30 },
-        { name: 'TOTAL', peso: '100%', meta: 'Soma dos Indicadores', pts: dddObj.total.toFixed(0), max: 100, isTotal: true }
+        { name: 'P1', peso: '30%', meta: '≥ 80% (≥85% = 30 pts)', real: dddObj.p1Real, pts: dddObj.ptsP1, max: 30 },
+        { name: 'P2', peso: '10%', meta: '≥ 70% (≥75% = 10 pts)', real: dddObj.p2Real, pts: dddObj.ptsP2, max: 10 },
+        { name: 'Preventiva - Execução', peso: '5%', meta: '100% = 5 pts', real: dddObj.prevExecReal, pts: dddObj.ptsExec, max: 5 },
+        { name: 'Preventiva - Qualidade', peso: '5%', meta: '≥ 95% (≥99% = 5 pts)', real: dddObj.prevQualReal, pts: dddObj.ptsQual, max: 5 },
+        { name: 'Fatura B', peso: '20%', meta: '≥ 100% = 20 pts', real: dddObj.faturaBReal, pts: dddObj.ptsFatB, max: 20 },
+        { name: 'HE + Sobreaviso', peso: '30%', meta: '≤ Orçamento', real: dddObj.gastoHE ? `R$ ${dddObj.gastoHE}` : 'No Orçamento', pts: dddObj.ptsHESob, max: 30 },
+        { name: 'TOTAL', peso: '100%', meta: 'Soma dos Indicadores', real: '-', pts: dddObj.total.toFixed(0), max: 100, isTotal: true }
       ];
 
       listInd.forEach(i => {
@@ -683,7 +739,7 @@
           <td class="p-1.5 text-left font-bold ${i.isTotal ? 'text-purple-400' : ''}">${i.name}</td>
           <td class="p-1.5 text-slate-400">${i.peso}</td>
           <td class="p-1.5 text-left text-slate-400 text-[10px]">${i.meta}</td>
-          <td class="p-1.5 text-slate-200">${i.isTotal ? '-' : 'OK'}</td>
+          <td class="p-1.5 text-sky-300 font-semibold">${i.real || '-'}</td>
           <td class="p-1.5 font-bold ${i.isTotal ? 'text-purple-400 text-sm' : 'text-emerald-400'}">${i.pts} / ${i.max}</td>
           <td class="p-1.5"><span class="status-pill ${stClass}"></span></td>
         `;
@@ -697,10 +753,10 @@
       chartEvolucaoDDDInst = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ['Sem 10', 'Sem 11', 'Sem 12', 'Sem 13', 'Sem 14'],
+          labels: ['Sem 37', 'Sem 38', 'Sem 39', 'Sem 40', `Sem ${selectedSemana.split('/')[0] || '41'}`],
           datasets: [{
             label: 'Evolução DDD',
-            data: [dddObj.total - 12, dddObj.total - 8, dddObj.total - 4, dddObj.total - 2, dddObj.total],
+            data: [dddObj.total - 10, dddObj.total - 7, dddObj.total - 4, dddObj.total - 2, dddObj.total],
             borderColor: '#a855f7',
             backgroundColor: 'rgba(168, 85, 247, 0.1)',
             fill: true,
