@@ -19,7 +19,7 @@
           colors: {
             themeBg: '#f0f4f8',
             themeCard: '#ffffff',
-            headerBg: '#0f172a',
+            headerBg: '#0b2341',
             brandBlue: '#0284c7',
             brandGreen: '#10b981',
             brandRed: '#f43f5e',
@@ -32,11 +32,17 @@
   </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-    body { font-family: 'Inter', sans-serif; background-color: #f0f4f8; color: #334155; }
-    .status-pill { display: inline-flex; align-items: center; justify-content: center; width: 10px; height: 10px; border-radius: 50%; }
-    .status-green { background-color: #10b981; box-shadow: 0 0 6px rgba(16, 185, 129, 0.4); }
-    .status-yellow { background-color: #f59e0b; box-shadow: 0 0 6px rgba(245, 158, 11, 0.4); }
-    .status-red { background-color: #f43f5e; box-shadow: 0 0 6px rgba(244, 63, 94, 0.4); }
+    body { font-family: 'Inter', sans-serif; background-color: #f0f4f8; color: #1e293b; }
+    .status-pill { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; }
+    .status-green { background-color: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, 0.5); }
+    .status-yellow { background-color: #eab308; box-shadow: 0 0 6px rgba(234, 179, 8, 0.5); }
+    .status-red { background-color: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.5); }
+    
+    /* Cores de células de desempenho (estilo foto) */
+    .cell-good { background-color: #e6f7ed; color: #166534; font-weight: 600; }
+    .cell-bad { background-color: #fde8e8; color: #991b1b; font-weight: 600; }
+    .cell-neutral { background-color: #ffffff; color: #334155; }
+    
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #e2e8f0; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -44,8 +50,8 @@
 </head>
 <body class="min-h-screen flex flex-col p-3 md:p-5 gap-4">
 
-  <!-- TOP HEADER (ESTILO DA IMAGEM) -->
-  <header class="bg-[#0f172a] text-white rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-md">
+  <!-- TOP HEADER -->
+  <header class="bg-[#0b2341] text-white rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-md">
     <div class="flex items-center gap-3">
       <div class="bg-sky-500 text-white p-2.5 rounded-lg shadow-sm flex items-center justify-center">
         <i class="fa-solid fa-shield-halved text-2xl"></i>
@@ -55,15 +61,15 @@
           <h1 class="text-lg font-bold tracking-tight text-white">CONTRATO VIVO - REDE ACESSO SPI (FIXA E MÓVEL)</h1>
           <span class="bg-sky-500/20 text-sky-300 text-xs px-2.5 py-0.5 rounded font-medium border border-sky-500/30">Google Sheets Live</span>
         </div>
-        <p class="text-xs text-slate-400 mt-0.5">Painel Gerencial de Desempenho • Acompanhamento por DDD e Coordenador</p>
+        <p class="text-xs text-slate-300 mt-0.5">Painel Gerencial de Desempenho • Acompanhamento por DDD e Coordenador</p>
       </div>
     </div>
 
     <!-- Header Actions -->
     <div class="flex items-center gap-3">
       <div class="text-right hidden sm:block">
-        <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Última sincronização</p>
-        <p class="text-xs font-bold text-slate-200" id="clock-timestamp">15:25</p>
+        <p class="text-[10px] text-slate-300 uppercase tracking-wider font-semibold">Última sincronização</p>
+        <p class="text-xs font-bold text-slate-100" id="clock-timestamp">15:25</p>
       </div>
 
       <select id="select-semana" onchange="filterBySemana()" class="bg-slate-800 border border-slate-700 text-sky-300 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
@@ -79,7 +85,7 @@
     </div>
   </header>
 
-  <!-- BANNER INFORMATIVO CLARO (ESTILO DA IMAGEM ANEXA) -->
+  <!-- BANNER INFORMATIVO -->
   <div id="status-banner" class="bg-[#e6f7f2] border border-emerald-200/80 text-emerald-900 px-4 py-2 rounded-lg text-xs flex flex-wrap items-center justify-between gap-2 shadow-sm">
     <div class="flex items-center gap-2">
       <i class="fa-solid fa-circle-check text-emerald-600" id="status-icon"></i>
@@ -92,87 +98,102 @@
     </div>
   </div>
 
-  <!-- BLOCO 1: PAINEL GERAL SPI & NOTA POR COORDENADOR -->
-  <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-    
-    <!-- Tabela 1. DESEMPENHO POR DDD (SEMANAL) -->
-    <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm flex flex-col justify-between">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-        <div>
-          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-            <i class="fa-solid fa-chart-column text-sky-600"></i> 1. PAINEL GERAL SPI – DESEMPENHO POR DDD
-          </h2>
-          <p class="text-[11px] text-slate-400">Detalhamento semanal dos indicadores operacionais</p>
-        </div>
-        <span class="text-xs font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2.5 py-0.5 rounded" id="lbl-semana-t1">Semana: --</span>
+  <!-- BLOCO 1: PAINEL GERAL SPI (LARGURA TOTAL CONFORME FOTO) -->
+  <section class="bg-white rounded-xl border border-slate-200/90 shadow-sm overflow-hidden p-4">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-4 bg-[#0b2341] rounded-sm"></div>
+        <h2 class="text-xs font-bold uppercase tracking-wider text-[#0b2341]" id="lbl-titulo-desempenho">
+          DESEMPENHO POR DDD (SEMANA: 14/2026)
+        </h2>
       </div>
-
-      <div class="overflow-x-auto mt-3">
-        <table class="w-full text-center border-collapse text-xs">
-          <thead>
-            <tr class="bg-slate-50 text-slate-500 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
-              <th class="p-2.5 text-left">DDD</th>
-              <th class="p-2.5 text-left">Regional</th>
-              <th class="p-2.5 text-left">Coordenador</th>
-              <th class="p-2.5 text-sky-700" title="Peso 30%">P1 (30)</th>
-              <th class="p-2.5 text-sky-700" title="Peso 10%">P2 (10)</th>
-              <th class="p-2.5 text-sky-700" title="Peso 5%">Prev. Exec. (5)</th>
-              <th class="p-2.5 text-sky-700" title="Peso 5%">Prev. Qual. (5)</th>
-              <th class="p-2.5 text-sky-700" title="Peso 20%">Fatura B (20)</th>
-              <th class="p-2.5 text-sky-700" title="Peso 30%">HE + Sob. (30)</th>
-              <th class="p-2.5 font-bold text-slate-900 bg-slate-100/80">Total (100)</th>
-              <th class="p-2.5">Ranking</th>
-              <th class="p-2.5">Status</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-ddd-semanal" class="divide-y divide-slate-100 font-normal text-slate-700">
-            <!-- Injetado via JS -->
-          </tbody>
-        </table>
-      </div>
-
-      <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-        <span>Pesos: P1 (30%) | P2 (10%) | Prev. Exec (5%) | Prev. Qual (5%) | Fatura B (20%) | HE+Sob (30%)</span>
-        <span id="lbl-total-ddds">Total: 8 DDDs</span>
-      </div>
+      <span class="text-xs font-bold text-sky-800 bg-sky-50 border border-sky-200 px-3 py-1 rounded-md" id="lbl-semana-t1">
+        Semana: --
+      </span>
     </div>
 
-    <!-- Tabela NOTA FINAL POR COORDENADOR & DISTRIBUIÇÃO DA NOTA -->
-    <div class="lg:col-span-4 space-y-4 flex flex-col justify-between">
-      
-      <!-- Nota por Coordenador -->
-      <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
-        <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-3">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-            <i class="fa-solid fa-trophy text-amber-500"></i> NOTA FINAL POR COORDENADOR
-          </h3>
-          <span class="text-[10px] text-slate-400 font-medium">Média dos DDDs</span>
-        </div>
-        <table class="w-full text-xs text-center border-collapse">
-          <thead>
-            <tr class="bg-slate-50 text-slate-500 font-semibold uppercase text-[10px] border-b border-slate-200">
-              <th class="p-2 text-left">Pos.</th>
-              <th class="p-2 text-left">Coordenador</th>
-              <th class="p-2">DDD(s)</th>
-              <th class="p-2 font-bold text-slate-900">Nota Final</th>
-            </tr>
-          </thead>
-          <tbody id="tbody-coordenadores" class="divide-y divide-slate-100 text-slate-700">
-            <!-- Injetado via JS -->
-          </tbody>
-        </table>
-      </div>
+    <!-- Tabela Geral Expandida com Pts e Resultados -->
+    <div class="overflow-x-auto mt-3">
+      <table class="w-full text-center border-collapse text-xs">
+        <thead>
+          <!-- Nível 1 de Cabeçalho: Agrupadores dos Indicadores -->
+          <tr class="bg-[#0b2341] text-white font-bold uppercase text-[10px] tracking-wider border-b border-slate-700">
+            <th class="p-2 border-r border-slate-700/60 text-left" rowspan="2">DDD</th>
+            <th class="p-2 border-r border-slate-700/60 text-left" rowspan="2">Regional</th>
+            <th class="p-2 border-r border-slate-700/60 text-left" rowspan="2">Coordenador</th>
+            <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">P1<br><span class="text-sky-300 font-normal">30 pts</span></th>
+            <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">P2<br><span class="text-sky-300 font-normal">10 pts</span></th>
+            <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">Prev. Execução<br><span class="text-sky-300 font-normal">5 pts</span></th>
+            <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">Prev. Qualidade<br><span class="text-sky-300 font-normal">5 pts</span></th>
+            <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">Fatura B<br><span class="text-sky-300 font-normal">20 pts</span></th>
+            <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="4">HE + Sobreaviso<br><span class="text-sky-300 font-normal">30 pts</span></th>
+            <th class="p-2 border-r border-slate-700/60 bg-[#1e4870] font-extrabold text-white text-sm" rowspan="2">Total<br>(100)</th>
+            <th class="p-2 border-r border-slate-700/60" rowspan="2">Ranking<br>DDD</th>
+            <th class="p-2" rowspan="2">Status</th>
+          </tr>
+          <!-- Nível 2 de Cabeçalho: Subcolunas de Resultado e Pts -->
+          <tr class="bg-[#123358] text-slate-200 font-semibold text-[9px] uppercase tracking-wider border-b border-slate-300">
+            <th class="p-1 border-r border-slate-600/50">Resultado</th>
+            <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
+            <th class="p-1 border-r border-slate-600/50">Resultado</th>
+            <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
+            <th class="p-1 border-r border-slate-600/50">Resultado</th>
+            <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
+            <th class="p-1 border-r border-slate-600/50">Resultado</th>
+            <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
+            <th class="p-1 border-r border-slate-600/50">Resultado</th>
+            <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
+            <th class="p-1 border-r border-slate-600/50">Orçado</th>
+            <th class="p-1 border-r border-slate-600/50">Realizado</th>
+            <th class="p-1 border-r border-slate-600/50">Variação</th>
+            <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-ddd-semanal" class="divide-y divide-slate-200 text-slate-800">
+          <!-- Preenchido via JavaScript -->
+        </tbody>
+      </table>
+    </div>
 
-      <!-- Distribuição por Faixa de Nota -->
-      <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm flex-1 flex flex-col justify-between">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2 flex items-center gap-1.5">
-          <i class="fa-solid fa-chart-pie text-sky-600"></i> DISTRIBUIÇÃO DOS DDDs POR FAIXA
+    <div class="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+      <span>Pesos: P1 (30%) | P2 (10%) | Prev. Exec (5%) | Prev. Qual (5%) | Fatura B (20%) | HE+Sob (30%)</span>
+      <span id="lbl-total-ddds">Total: 8 DDDs</span>
+    </div>
+  </section>
+
+  <!-- BLOCO INTERMEDIÁRIO: COORDENADORES & DISTRIBUIÇÃO FAIXA DE NOTA -->
+  <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    
+    <!-- Nota por Coordenador -->
+    <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200/80 p-4 shadow-sm">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-[#0b2341] flex items-center gap-1.5">
+          <i class="fa-solid fa-trophy text-amber-500"></i> NOTA FINAL POR COORDENADOR (MÉDIA DOS DDDs)
         </h3>
-        <div class="h-36 relative">
-          <canvas id="chart-faixa-notas"></canvas>
-        </div>
       </div>
+      <table class="w-full text-xs text-center border-collapse">
+        <thead>
+          <tr class="bg-slate-100 text-slate-600 font-bold uppercase text-[10px] border-b border-slate-200">
+            <th class="p-2 text-left">Pos.</th>
+            <th class="p-2 text-left">Coordenador</th>
+            <th class="p-2">DDD(s)</th>
+            <th class="p-2 font-bold text-slate-900">Nota Final</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-coordenadores" class="divide-y divide-slate-100 text-slate-700">
+          <!-- Injetado via JS -->
+        </tbody>
+      </table>
+    </div>
 
+    <!-- Distribuição por Faixa de Nota -->
+    <div class="lg:col-span-5 bg-white rounded-xl border border-slate-200/80 p-4 shadow-sm flex flex-col justify-between">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-[#0b2341] mb-2 flex items-center gap-1.5">
+        <i class="fa-solid fa-chart-pie text-sky-600"></i> DISTRIBUIÇÃO DOS DDDs POR FAIXA DE NOTA
+      </h3>
+      <div class="h-40 relative">
+        <canvas id="chart-faixa-notas"></canvas>
+      </div>
     </div>
 
   </section>
@@ -181,9 +202,7 @@
   <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
     
     <!-- BLOCO 2: FICHA DA COORDENAÇÃO -->
-    <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm space-y-4">
-      
-      <!-- Header Ficha Coordenação -->
+    <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200/80 p-4 shadow-sm space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
         <div>
           <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
@@ -196,7 +215,7 @@
         </select>
       </div>
 
-      <!-- Cards de Resultado da Coordenação -->
+      <!-- Cards de Resultado -->
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 text-center">
           <span class="text-[10px] text-slate-400 font-semibold uppercase block">NOTA COORDENAÇÃO</span>
@@ -212,7 +231,7 @@
         </div>
       </div>
 
-      <!-- Detalhamento por DDD do Coordenador -->
+      <!-- Detalhamento por DDD -->
       <div>
         <h3 class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Indicadores Agregados por DDD</h3>
         <div class="overflow-x-auto">
@@ -233,7 +252,7 @@
         </div>
       </div>
 
-      <!-- Evolução e Ações do Coordenador -->
+      <!-- Evolução e Ações -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80">
           <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2">EVOLUÇÃO HISTÓRICA</h4>
@@ -250,13 +269,10 @@
           </ul>
         </div>
       </div>
-
     </div>
 
     <!-- BLOCO 3: FICHA INDIVIDUAL DO DDD -->
-    <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm space-y-4">
-      
-      <!-- Header Ficha Individual do DDD -->
+    <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200/80 p-4 shadow-sm space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
         <div>
           <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
@@ -269,7 +285,7 @@
         </select>
       </div>
 
-      <!-- Top Stats do DDD -->
+      <!-- Top Stats -->
       <div class="grid grid-cols-4 gap-2 text-center">
         <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
           <span class="text-[9px] text-slate-400 font-bold uppercase block">NOTA DDD</span>
@@ -289,7 +305,7 @@
         </div>
       </div>
 
-      <!-- Desempenho dos Indicadores do DDD -->
+      <!-- Tabela de Indicadores -->
       <div>
         <h3 class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Desempenho dos Indicadores no DDD</h3>
         <div class="overflow-x-auto">
@@ -311,7 +327,7 @@
         </div>
       </div>
 
-      <!-- Evolução Semanal e Plano de Ação -->
+      <!-- Evolução e Ações -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80">
           <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2">EVOLUÇÃO SEMANAL</h4>
@@ -327,12 +343,11 @@
           </div>
         </div>
       </div>
-
     </div>
 
   </section>
 
-  <!-- JAVASCRIPT: PAPAPARSE & LÓGICA DE DADOS (PRESERVADA E INTACTA) -->
+  <!-- JAVASCRIPT: PROCESSAMENTO DAS SUBCOLUNAS E RENDERIZAÇÃO DA TABELA EXPANDIDA -->
   <script>
     const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vShU66oSm1Q0GBrBINsiaCR64uGW_mP2MLPckpcjyZmjwDJFSaXiamg_D-mGQTlQ7WGmJjcR-CkZCD_/pub?gid=796515673&single=true&output=csv';
 
@@ -402,34 +417,37 @@
           return isNaN(n) ? 0 : n;
         };
 
-        const semana = getVal(['Semana']) || '41/2026';
+        const semana = getVal(['Semana']) || '14/2026';
         const mesRef = getVal(['Mês', 'Mes']) || 'Setembro/2026';
         const ddd = getVal(['DDD']) || `DDD-${index+1}`;
         const regional = getVal(['Regional', 'Praça', 'Praca']) || 'Regional';
         const coordenador = getVal(['Coordenador']) || 'Não informado';
 
-        const p1Real = getVal(['P1 Real']);
-        const p2Real = getVal(['P2 Real']);
-        const prevExecReal = getVal(['Prev. Exec. (%)', 'Exec. (%)']);
-        const prevQualReal = getVal(['Prev. Qual. (%)', 'Qual. (%)']);
-        const faturaBReal = getVal(['Fatura B (%)']);
+        // Resultados Brutos das Colunas da Foto
+        const p1Real = getVal(['P1 Real', 'P1 Resultado']) || '0%';
+        const p2Real = getVal(['P2 Real', 'P2 Resultado']) || '0%';
+        const prevExecReal = getVal(['Prev. Exec. (%)', 'Exec. Resultado', 'Exec. (%)']) || '0%';
+        const prevQualReal = getVal(['Prev. Qual. (%)', 'Qual. Resultado', 'Qual. (%)']) || '0%';
+        const faturaBReal = getVal(['Fatura B (%)', 'Fatura B Resultado']) || '0%';
 
-        const orcHE = getVal(['Orçamento HE']);
-        const gastoHE = getVal(['Gasto Real HE']);
+        const orcHE = getVal(['Orçamento HE', 'Orcado']) || 'R$ 0';
+        const gastoHE = getVal(['Gasto Real HE', 'Realizado']) || 'R$ 0';
+        const varHE = getVal(['Var. vs Orçamento', 'Variação', 'Variacao']) || '0%';
 
-        const ptsP1 = parseNum(getVal(['Pts P1', 'P1 (30)']));
-        const ptsP2 = parseNum(getVal(['Pts P2', 'P2 (10)']));
-        const ptsExec = parseNum(getVal(['Pts Exec', 'Exec (5)']));
-        const ptsQual = parseNum(getVal(['Pts Qual', 'Qual (5)']));
-        const ptsFatB = parseNum(getVal(['Pts FatB', 'FatB (20)']));
-        const ptsHESob = parseNum(getVal(['Pts HE/Sob', 'HE/Sob (30)']));
+        // Pontos Computados
+        const ptsP1 = parseNum(getVal(['Pts P1', 'P1 (30)', 'P1 Pts']));
+        const ptsP2 = parseNum(getVal(['Pts P2', 'P2 (10)', 'P2 Pts']));
+        const ptsExec = parseNum(getVal(['Pts Exec', 'Exec (5)', 'Exec Pts']));
+        const ptsQual = parseNum(getVal(['Pts Qual', 'Qual (5)', 'Qual Pts']));
+        const ptsFatB = parseNum(getVal(['Pts FatB', 'FatB (20)', 'FatB Pts']));
+        const ptsHESob = parseNum(getVal(['Pts HE/Sob', 'HE/Sob (30)', 'HE Pts']));
 
         const total = parseNum(getVal(['NOTA TOTAL', 'TOTAL (100)']));
 
         return {
           semana, mesRef, ddd, regional, coordenador,
           p1Real, p2Real, prevExecReal, prevQualReal, faturaBReal,
-          gastoHE,
+          orcHE, gastoHE, varHE,
           ptsP1, ptsP2, ptsExec, ptsQual, ptsFatB, ptsHESob,
           total: total || (ptsP1 + ptsP2 + ptsExec + ptsQual + ptsFatB + ptsHESob)
         };
@@ -462,6 +480,7 @@
 
       if (dddDataFiltered.length > 0) {
         document.getElementById('lbl-semana-t1').innerText = `Semana: ${dddDataFiltered[0].semana}`;
+        document.getElementById('lbl-titulo-desempenho').innerText = `DESEMPENHO POR DDD (SEMANA: ${dddDataFiltered[0].semana})`;
         document.getElementById('lbl-total-ddds').innerText = `Total: ${dddDataFiltered.length} DDDs`;
       }
 
@@ -517,31 +536,57 @@
       });
     }
 
+    // RENDERIZAR TABELA 1 EXPANDIDA (CÓPIA FIEL DA IMAGEM)
     function renderTabelaSemanal() {
       const tbody = document.getElementById('tbody-ddd-semanal');
       tbody.innerHTML = '';
 
       dddDataFiltered.forEach(d => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50/80 transition border-b border-slate-100";
+        tr.className = "hover:bg-slate-50 transition border-b border-slate-200/80";
 
         let statusClass = "status-green";
         if (d.total < 70) statusClass = "status-red";
         else if (d.total < 85) statusClass = "status-yellow";
 
+        // Estilos de destaque para células boas vs ruins conforme foto
+        const getCellClass = (pts, max) => pts === max ? 'cell-good' : (pts === 0 ? 'cell-bad' : 'cell-neutral');
+
         tr.innerHTML = `
-          <td class="p-2.5 text-left font-bold text-slate-900">${d.ddd}</td>
-          <td class="p-2.5 text-left text-slate-600">${d.regional}</td>
-          <td class="p-2.5 text-left font-medium text-sky-700">${d.coordenador}</td>
-          <td class="p-2.5 font-semibold text-slate-800">${d.ptsP1}</td>
-          <td class="p-2.5 font-semibold text-slate-800">${d.ptsP2}</td>
-          <td class="p-2.5 font-semibold text-slate-800">${d.ptsExec}</td>
-          <td class="p-2.5 font-semibold text-slate-800">${d.ptsQual}</td>
-          <td class="p-2.5 font-semibold text-slate-800">${d.ptsFatB}</td>
-          <td class="p-2.5 font-semibold text-slate-800">${d.ptsHESob}</td>
-          <td class="p-2.5 font-extrabold text-slate-900 bg-slate-100/80 text-sm">${d.total.toFixed(0)}</td>
-          <td class="p-2.5 font-bold text-slate-600">${d.rankingDDD}º</td>
-          <td class="p-2.5"><span class="status-pill ${statusClass}"></span></td>
+          <td class="p-2 text-left font-bold text-slate-900 border-r border-slate-200/60">${d.ddd}</td>
+          <td class="p-2 text-left text-slate-700 border-r border-slate-200/60">${d.regional}</td>
+          <td class="p-2 text-left font-bold text-slate-900 border-r border-slate-200/60">${d.coordenador}</td>
+          
+          <!-- P1 -->
+          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsP1, 30)}">${d.p1Real}</td>
+          <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsP1, 30)}">${d.ptsP1}</td>
+          
+          <!-- P2 -->
+          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsP2, 10)}">${d.p2Real}</td>
+          <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsP2, 10)}">${d.ptsP2}</td>
+          
+          <!-- Prev. Exec -->
+          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsExec, 5)}">${d.prevExecReal}</td>
+          <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsExec, 5)}">${d.ptsExec}</td>
+          
+          <!-- Prev. Qual -->
+          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsQual, 5)}">${d.prevQualReal}</td>
+          <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsQual, 5)}">${d.ptsQual}</td>
+          
+          <!-- Fatura B -->
+          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsFatB, 20)}">${d.faturaBReal}</td>
+          <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsFatB, 20)}">${d.ptsFatB}</td>
+          
+          <!-- HE + Sob -->
+          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsHESob, 30)}">${d.orcHE}</td>
+          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsHESob, 30)}">${d.gastoHE}</td>
+          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsHESob, 30)}">${d.varHE}</td>
+          <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsHESob, 30)}">${d.ptsHESob}</td>
+          
+          <!-- Total & Status -->
+          <td class="p-2 font-extrabold text-slate-900 bg-slate-100/90 text-sm border-r border-slate-200/60">${d.total.toFixed(0)}</td>
+          <td class="p-2 font-bold text-slate-700 border-r border-slate-200/60">${d.rankingDDD}º</td>
+          <td class="p-2"><span class="status-pill ${statusClass}"></span></td>
         `;
         tbody.appendChild(tr);
       });
@@ -553,12 +598,12 @@
 
       coordenadoresData.forEach(c => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50/80 transition border-b border-slate-100";
+        tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
 
         tr.innerHTML = `
           <td class="p-2 text-left font-bold text-amber-500">${c.posicao}º</td>
-          <td class="p-2 text-left font-medium text-slate-800">${c.coordenador}</td>
-          <td class="p-2 text-slate-500">${c.ddds}</td>
+          <td class="p-2 text-left font-bold text-slate-800">${c.coordenador}</td>
+          <td class="p-2 text-slate-500 font-medium">${c.ddds}</td>
           <td class="p-2 font-extrabold text-emerald-600 text-sm">${c.notaFinal.toFixed(1)}</td>
         `;
         tbody.appendChild(tr);
@@ -649,7 +694,7 @@
       chartEvolucaoCoordInst = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ['Sem 37', 'Sem 38', 'Sem 39', 'Sem 40', `Sem ${selectedSemana.split('/')[0] || '41'}`],
+          labels: ['Sem 10', 'Sem 11', 'Sem 12', 'Sem 13', `Sem ${selectedSemana.split('/')[0] || '14'}`],
           datasets: [{
             label: 'Nota Coordenação',
             data: [coordObj.notaFinal - 6, coordObj.notaFinal - 4, coordObj.notaFinal - 2, coordObj.notaFinal - 1, coordObj.notaFinal],
@@ -702,7 +747,7 @@
         { name: 'Preventiva - Execução', peso: '5%', meta: '100% = 5 pts', real: dddObj.prevExecReal, pts: dddObj.ptsExec, max: 5 },
         { name: 'Preventiva - Qualidade', peso: '5%', meta: '≥ 95% (≥99% = 5 pts)', real: dddObj.prevQualReal, pts: dddObj.ptsQual, max: 5 },
         { name: 'Fatura B', peso: '20%', meta: '≥ 100% = 20 pts', real: dddObj.faturaBReal, pts: dddObj.ptsFatB, max: 20 },
-        { name: 'HE + Sobreaviso', peso: '30%', meta: '≤ Orçamento', real: dddObj.gastoHE ? `R$ ${dddObj.gastoHE}` : 'No Orçamento', pts: dddObj.ptsHESob, max: 30 },
+        { name: 'HE + Sobreaviso', peso: '30%', meta: '≤ Orçamento', real: dddObj.gastoHE ? `${dddObj.gastoHE}` : 'No Orçamento', pts: dddObj.ptsHESob, max: 30 },
         { name: 'TOTAL', peso: '100%', meta: 'Soma dos Indicadores', real: '-', pts: dddObj.total.toFixed(0), max: 100, isTotal: true }
       ];
 
@@ -733,7 +778,7 @@
       chartEvolucaoDDDInst = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ['Sem 37', 'Sem 38', 'Sem 39', 'Sem 40', `Sem ${selectedSemana.split('/')[0] || '41'}`],
+          labels: ['Sem 10', 'Sem 11', 'Sem 12', 'Sem 13', `Sem ${selectedSemana.split('/')[0] || '14'}`],
           datasets: [{
             label: 'Evolução DDD',
             data: [dddObj.total - 10, dddObj.total - 7, dddObj.total - 4, dddObj.total - 2, dddObj.total],
