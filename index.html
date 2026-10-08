@@ -17,9 +17,9 @@
       theme: {
         extend: {
           colors: {
-            themeBg: '#edf2f8',
+            themeBg: '#f0f4f8',
             themeCard: '#ffffff',
-            headerBg: '#0f172a',
+            headerBg: '#0e1726',
             brandBlue: '#0284c7',
             brandGreen: '#10b981',
             brandRed: '#f43f5e',
@@ -32,19 +32,19 @@
   </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-    body { font-family: 'Inter', sans-serif; background-color: #edf2f8; color: #334155; }
+    body { font-family: 'Inter', sans-serif; background-color: #f0f4f8; color: #334155; }
     .status-pill { display: inline-flex; align-items: center; justify-content: center; width: 10px; height: 10px; border-radius: 50%; }
-    .status-green { background-color: #10b981; box-shadow: 0 0 6px rgba(16, 185, 129, 0.5); }
-    .status-yellow { background-color: #f59e0b; box-shadow: 0 0 6px rgba(245, 158, 11, 0.5); }
-    .status-red { background-color: #f43f5e; box-shadow: 0 0 6px rgba(244, 63, 94, 0.5); }
+    .status-green { background-color: #10b981; box-shadow: 0 0 6px rgba(16, 185, 129, 0.4); }
+    .status-yellow { background-color: #f59e0b; box-shadow: 0 0 6px rgba(245, 158, 11, 0.4); }
+    .status-red { background-color: #f43f5e; box-shadow: 0 0 6px rgba(244, 63, 94, 0.4); }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #e2e8f0; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col p-3 md:p-6 gap-4">
+<body class="min-h-screen flex flex-col p-3 md:p-5 gap-4">
 
-  <!-- TOP HEADER (ESCUDO + ESTILO IMAGEM) -->
+  <!-- TOP HEADER (PADRÃO DA IMAGEM ANEXA) -->
   <header class="bg-slate-900 text-white rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-md">
     <div class="flex items-center gap-3">
       <div class="bg-sky-500 text-white p-2.5 rounded-lg shadow-sm flex items-center justify-center">
@@ -63,15 +63,15 @@
     <div class="flex items-center gap-3">
       <div class="text-right hidden sm:block">
         <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Última sincronização</p>
-        <p class="text-xs font-bold text-slate-200" id="clock-timestamp">Hoje às 13:57</p>
+        <p class="text-xs font-bold text-slate-200" id="clock-timestamp">15:25</p>
       </div>
 
-      <select id="select-semana" onchange="filterBySemana()" class="bg-slate-800 border border-slate-700 text-sky-400 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+      <select id="select-semana" onchange="filterBySemana()" class="bg-slate-800 border border-slate-700 text-sky-300 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
         <!-- Injetado via JS -->
       </select>
 
-      <button onclick="fetchGoogleSheetsData()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold shadow-sm flex items-center gap-1.5 transition">
-        <i class="fa-solid fa-rotate text-xs"></i> Sincronizar
+      <button onclick="fetchGoogleSheetsData()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-sm flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-rotate text-xs"></i> Atualizar Dados
       </button>
       <button onclick="window.print()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium border border-slate-700 flex items-center gap-1.5 transition">
         <i class="fa-solid fa-print"></i> Relatório
@@ -79,24 +79,24 @@
     </div>
   </header>
 
-  <!-- BANNER INFORMATIVO (ALINHAMENTO OPERACIONAL) -->
-  <div id="status-banner" class="bg-emerald-50 border border-emerald-200/80 text-emerald-900 px-4 py-2 rounded-xl text-xs flex flex-wrap items-center justify-between gap-2 shadow-sm">
+  <!-- BANNER INFORMATIVO (CORES E ESTILO DA IMAGEM) -->
+  <div id="status-banner" class="bg-emerald-50/90 border border-emerald-200/80 text-emerald-900 px-4 py-2 rounded-lg text-xs flex flex-wrap items-center justify-between gap-2 shadow-sm">
     <div class="flex items-center gap-2">
-      <i class="fa-solid fa-circle-check text-emerald-600" id="status-icon"></i>
+      <i class="fa-solid fa-circle-notch fa-spin text-emerald-600" id="status-icon"></i>
       <span id="status-text">Conectando à Planilha do Google Sheets...</span>
     </div>
-    <div class="flex items-center gap-4 text-[11px] font-semibold">
-      <span class="flex items-center gap-1.5"><span class="status-pill status-green"></span> Dentro da meta (≥85)</span>
-      <span class="flex items-center gap-1.5"><span class="status-pill status-yellow"></span> Atenção (70-84)</span>
-      <span class="flex items-center gap-1.5"><span class="status-pill status-red"></span> Fora da meta (&lt;70)</span>
+    <div class="flex items-center gap-3">
+      <span class="bg-amber-100/80 border border-amber-200 text-amber-900 font-semibold px-2.5 py-0.5 rounded text-[11px]">
+        Diretriz: Site Recuperado ≠ Site Protegido
+      </span>
     </div>
   </div>
 
   <!-- BLOCO 1: PAINEL GERAL SPI & NOTA POR COORDENADOR -->
-  <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+  <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
     
     <!-- Tabela 1. DESEMPENHO POR DDD (SEMANAL) -->
-    <div class="lg:col-span-8 bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm flex flex-col justify-between">
+    <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm flex flex-col justify-between">
       <div class="flex items-center justify-between pb-3 border-b border-slate-100">
         <div>
           <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
@@ -138,10 +138,10 @@
     </div>
 
     <!-- Tabela NOTA FINAL POR COORDENADOR & DISTRIBUIÇÃO DA NOTA -->
-    <div class="lg:col-span-4 space-y-5 flex flex-col justify-between">
+    <div class="lg:col-span-4 space-y-4 flex flex-col justify-between">
       
       <!-- Nota por Coordenador -->
-      <div class="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
+      <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
         <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-3">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
             <i class="fa-solid fa-trophy text-amber-500"></i> NOTA FINAL POR COORDENADOR
@@ -164,7 +164,7 @@
       </div>
 
       <!-- Distribuição por Faixa de Nota -->
-      <div class="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm flex-1 flex flex-col justify-between">
+      <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm flex-1 flex flex-col justify-between">
         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2 flex items-center gap-1.5">
           <i class="fa-solid fa-chart-pie text-sky-600"></i> DISTRIBUIÇÃO DOS DDDs POR FAIXA
         </h3>
@@ -178,10 +178,10 @@
   </section>
 
   <!-- BLOCO 2 & 3: FICHAS INTERATIVAS DA COORDENAÇÃO E INDIVIDUAL DO DDD -->
-  <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+  <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
     
     <!-- BLOCO 2: FICHA DA COORDENAÇÃO -->
-    <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm space-y-4">
+    <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm space-y-4">
       
       <!-- Header Ficha Coordenação -->
       <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
@@ -196,7 +196,7 @@
         </select>
       </div>
 
-      <!-- Cards de Resultado da Coordenação (Estilo Imagem) -->
+      <!-- Cards de Resultado da Coordenação -->
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 text-center">
           <span class="text-[10px] text-slate-400 font-semibold uppercase block">NOTA COORDENAÇÃO</span>
@@ -254,7 +254,7 @@
     </div>
 
     <!-- BLOCO 3: FICHA INDIVIDUAL DO DDD -->
-    <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm space-y-4">
+    <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm space-y-4">
       
       <!-- Header Ficha Individual do DDD -->
       <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
@@ -332,7 +332,7 @@
 
   </section>
 
-  <!-- JAVASCRIPT: PAPAPARSE & LÓGICA DE DADOS -->
+  <!-- JAVASCRIPT: PAPAPARSE & LÓGICA DE DADOS (100% PRESERVADOS) -->
   <script>
     const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vShU66oSm1Q0GBrBINsiaCR64uGW_mP2MLPckpcjyZmjwDJFSaXiamg_D-mGQTlQ7WGmJjcR-CkZCD_/pub?gid=796515673&single=true&output=csv';
 
@@ -353,7 +353,7 @@
       const bannerText = document.getElementById('status-text');
       const icon = document.getElementById('status-icon');
       
-      icon.className = "fa-solid fa-circle-notch fa-spin text-sky-600";
+      icon.className = "fa-solid fa-circle-notch fa-spin text-emerald-600";
       bannerText.innerText = "Sincronizando com a Planilha Google Sheets...";
 
       Papa.parse(GOOGLE_SHEETS_CSV_URL, {
@@ -368,7 +368,7 @@
             
             icon.className = "fa-solid fa-circle-check text-emerald-600";
             bannerText.innerHTML = `<strong>Sucesso:</strong> Base sincronizada com ${allRowsParsed.length} registros da Planilha Google!`;
-            document.getElementById('clock-timestamp').innerText = `Hoje às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+            document.getElementById('clock-timestamp').innerText = `${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
           } else {
             showError("Planilha retornou vazia ou sem estrutura de cabeçalhos.");
           }
