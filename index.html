@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Gerencial SPI - Desempenho por DDD e Coordenador (Contrato Vivo)</title>
+  <title>Portal Gerencial SPI - Desempenho por DDD e Coordenador</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- PapaParse CDN (Para leitura do CSV do Google Sheets) -->
+  <!-- PapaParse CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -17,15 +17,14 @@
       theme: {
         extend: {
           colors: {
-            vivo: {
-              navy: '#0c2340',
-              blue: '#1f4e78',
-              lightBlue: '#2f5597',
-              purple: '#660099',
-              green: '#2e7d32',
-              yellow: '#f59e0b',
-              red: '#d32f2f'
-            }
+            themeBg: '#edf2f8',
+            themeCard: '#ffffff',
+            headerBg: '#0f172a',
+            brandBlue: '#0284c7',
+            brandGreen: '#10b981',
+            brandRed: '#f43f5e',
+            brandYellow: '#f59e0b',
+            brandPurple: '#6366f1'
           }
         }
       }
@@ -33,28 +32,28 @@
   </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-    body { font-family: 'Inter', sans-serif; background-color: #081325; color: #f8fafc; }
-    .status-pill { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; }
-    .status-green { background-color: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.6); }
-    .status-yellow { background-color: #eab308; box-shadow: 0 0 8px rgba(234, 179, 8, 0.6); }
-    .status-red { background-color: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
+    body { font-family: 'Inter', sans-serif; background-color: #edf2f8; color: #334155; }
+    .status-pill { display: inline-flex; align-items: center; justify-content: center; width: 10px; height: 10px; border-radius: 50%; }
+    .status-green { background-color: #10b981; box-shadow: 0 0 6px rgba(16, 185, 129, 0.5); }
+    .status-yellow { background-color: #f59e0b; box-shadow: 0 0 6px rgba(245, 158, 11, 0.5); }
+    .status-red { background-color: #f43f5e; box-shadow: 0 0 6px rgba(244, 63, 94, 0.5); }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #0f172a; }
-    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-track { background: #e2e8f0; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
   </style>
 </head>
-<body class="min-h-screen flex flex-col p-3 md:p-5 gap-4">
+<body class="min-h-screen flex flex-col p-3 md:p-6 gap-4">
 
-  <!-- TOP HEADER -->
-  <header class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+  <!-- TOP HEADER (ESCUDO + ESTILO IMAGEM) -->
+  <header class="bg-slate-900 text-white rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-md">
     <div class="flex items-center gap-3">
-      <div class="bg-purple-700 text-white p-3 rounded-lg shadow-md flex items-center justify-center">
-        <i class="fa-solid fa-chart-line text-2xl"></i>
+      <div class="bg-sky-500 text-white p-2.5 rounded-lg shadow-sm flex items-center justify-center">
+        <i class="fa-solid fa-shield-halved text-2xl"></i>
       </div>
       <div>
         <div class="flex items-center gap-2">
-          <h1 class="text-xl font-extrabold tracking-tight text-white">CONTRATO VIVO - REDE ACESSO SPI (FIXA E MÓVEL)</h1>
-          <span class="bg-purple-900/60 text-purple-300 text-xs px-2.5 py-0.5 rounded-full font-bold border border-purple-500/30">Google Sheets Live</span>
+          <h1 class="text-lg font-bold tracking-tight text-white">CONTRATO VIVO - REDE ACESSO SPI (FIXA E MÓVEL)</h1>
+          <span class="bg-sky-500/20 text-sky-300 text-xs px-2.5 py-0.5 rounded font-medium border border-sky-500/30">Google Sheets Live</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5">Painel Gerencial de Desempenho • Acompanhamento por DDD e Coordenador</p>
       </div>
@@ -63,28 +62,27 @@
     <!-- Header Actions -->
     <div class="flex items-center gap-3">
       <div class="text-right hidden sm:block">
-        <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Semana / Mês Ref.</p>
-        <p class="text-xs font-bold text-sky-400" id="header-periodo">Carregando...</p>
+        <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Última sincronização</p>
+        <p class="text-xs font-bold text-slate-200" id="clock-timestamp">Hoje às 13:57</p>
       </div>
-      
-      <!-- Selector de Semana (caso existam várias) -->
-      <select id="select-semana" onchange="filterBySemana()" class="bg-slate-800 border border-slate-700 text-sky-400 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+
+      <select id="select-semana" onchange="filterBySemana()" class="bg-slate-800 border border-slate-700 text-sky-400 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
         <!-- Injetado via JS -->
       </select>
 
-      <button onclick="fetchGoogleSheetsData()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-md flex items-center gap-2 transition">
+      <button onclick="fetchGoogleSheetsData()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold shadow-sm flex items-center gap-1.5 transition">
         <i class="fa-solid fa-rotate text-xs"></i> Sincronizar
       </button>
       <button onclick="window.print()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium border border-slate-700 flex items-center gap-1.5 transition">
-        <i class="fa-solid fa-print"></i> Imprimir
+        <i class="fa-solid fa-print"></i> Relatório
       </button>
     </div>
   </header>
 
-  <!-- BANNER DE STATUS DO CARREGAMENTO -->
-  <div id="status-banner" class="bg-slate-900 border border-slate-800 text-slate-300 px-4 py-2 rounded-lg text-xs flex items-center justify-between">
+  <!-- BANNER INFORMATIVO (ALINHAMENTO OPERACIONAL) -->
+  <div id="status-banner" class="bg-emerald-50 border border-emerald-200/80 text-emerald-900 px-4 py-2 rounded-xl text-xs flex flex-wrap items-center justify-between gap-2 shadow-sm">
     <div class="flex items-center gap-2">
-      <i class="fa-solid fa-circle-notch fa-spin text-sky-400" id="status-spinner"></i>
+      <i class="fa-solid fa-circle-check text-emerald-600" id="status-icon"></i>
       <span id="status-text">Conectando à Planilha do Google Sheets...</span>
     </div>
     <div class="flex items-center gap-4 text-[11px] font-semibold">
@@ -95,76 +93,80 @@
   </div>
 
   <!-- BLOCO 1: PAINEL GERAL SPI & NOTA POR COORDENADOR -->
-  <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+  <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
     
     <!-- Tabela 1. DESEMPENHO POR DDD (SEMANAL) -->
-    <div class="lg:col-span-8 bg-slate-900 rounded-xl border border-slate-800 p-4 shadow-xl flex flex-col justify-between">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-        <h2 class="text-sm font-extrabold uppercase tracking-wide text-sky-400 flex items-center gap-2">
-          <i class="fa-solid fa-table-cells"></i> 1. PAINEL GERAL SPI – DESEMPENHO POR DDD (SEMANAL)
-        </h2>
-        <span class="text-xs font-bold text-slate-400" id="lbl-semana-t1">Semana: --</span>
+    <div class="lg:col-span-8 bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm flex flex-col justify-between">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div>
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-chart-column text-sky-600"></i> 1. PAINEL GERAL SPI – DESEMPENHO POR DDD
+          </h2>
+          <p class="text-[11px] text-slate-400">Detalhamento semanal dos indicadores operacionais</p>
+        </div>
+        <span class="text-xs font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2.5 py-0.5 rounded" id="lbl-semana-t1">Semana: --</span>
       </div>
 
       <div class="overflow-x-auto mt-3">
         <table class="w-full text-center border-collapse text-xs">
           <thead>
-            <tr class="bg-slate-800/80 text-slate-300 font-bold uppercase text-[10px] tracking-wider border-b border-slate-700">
-              <th class="p-2 text-left">DDD</th>
-              <th class="p-2 text-left">Regional</th>
-              <th class="p-2 text-left">Coordenador</th>
-              <th class="p-2 text-emerald-400" title="Peso 30%">P1 (30)</th>
-              <th class="p-2 text-emerald-400" title="Peso 10%">P2 (10)</th>
-              <th class="p-2 text-sky-400" title="Peso 5%">Prev. Exec. (5)</th>
-              <th class="p-2 text-sky-400" title="Peso 5%">Prev. Qual. (5)</th>
-              <th class="p-2 text-amber-400" title="Peso 20%">Fatura B (20)</th>
-              <th class="p-2 text-purple-400" title="Peso 30%">HE + Sob. (30)</th>
-              <th class="p-2 font-extrabold text-white bg-slate-800">Total (100)</th>
-              <th class="p-2">Ranking</th>
-              <th class="p-2">Status</th>
+            <tr class="bg-slate-50 text-slate-500 font-semibold uppercase text-[10px] tracking-wider border-b border-slate-200">
+              <th class="p-2.5 text-left">DDD</th>
+              <th class="p-2.5 text-left">Regional</th>
+              <th class="p-2.5 text-left">Coordenador</th>
+              <th class="p-2.5 text-sky-700" title="Peso 30%">P1 (30)</th>
+              <th class="p-2.5 text-sky-700" title="Peso 10%">P2 (10)</th>
+              <th class="p-2.5 text-sky-700" title="Peso 5%">Prev. Exec. (5)</th>
+              <th class="p-2.5 text-sky-700" title="Peso 5%">Prev. Qual. (5)</th>
+              <th class="p-2.5 text-sky-700" title="Peso 20%">Fatura B (20)</th>
+              <th class="p-2.5 text-sky-700" title="Peso 30%">HE + Sob. (30)</th>
+              <th class="p-2.5 font-bold text-slate-900 bg-slate-100/80">Total (100)</th>
+              <th class="p-2.5">Ranking</th>
+              <th class="p-2.5">Status</th>
             </tr>
           </thead>
-          <tbody id="tbody-ddd-semanal" class="divide-y divide-slate-800/60 font-medium">
-            <!-- Injetado dinamicamente -->
+          <tbody id="tbody-ddd-semanal" class="divide-y divide-slate-100 font-normal text-slate-700">
+            <!-- Injetado via JS -->
           </tbody>
         </table>
       </div>
 
-      <div class="mt-3 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+      <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
         <span>Pesos: P1 (30%) | P2 (10%) | Prev. Exec (5%) | Prev. Qual (5%) | Fatura B (20%) | HE+Sob (30%)</span>
         <span id="lbl-total-ddds">Total: 8 DDDs</span>
       </div>
     </div>
 
     <!-- Tabela NOTA FINAL POR COORDENADOR & DISTRIBUIÇÃO DA NOTA -->
-    <div class="lg:col-span-4 space-y-4 flex flex-col justify-between">
+    <div class="lg:col-span-4 space-y-5 flex flex-col justify-between">
       
       <!-- Nota por Coordenador -->
-      <div class="bg-slate-900 rounded-xl border border-slate-800 p-4 shadow-xl">
-        <div class="flex items-center justify-between pb-2 border-b border-slate-800 mb-3">
-          <h3 class="text-xs font-extrabold uppercase tracking-wide text-amber-400 flex items-center gap-1.5">
-            <i class="fa-solid fa-trophy"></i> NOTA FINAL POR COORDENADOR (MÉDIA DOS DDDs)
+      <div class="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-3">
+          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-trophy text-amber-500"></i> NOTA FINAL POR COORDENADOR
           </h3>
+          <span class="text-[10px] text-slate-400 font-medium">Média dos DDDs</span>
         </div>
         <table class="w-full text-xs text-center border-collapse">
           <thead>
-            <tr class="bg-slate-800/80 text-slate-400 font-bold uppercase text-[10px] border-b border-slate-700">
-              <th class="p-1.5 text-left">Pos.</th>
-              <th class="p-1.5 text-left">Coordenador</th>
-              <th class="p-1.5">DDD(s)</th>
-              <th class="p-1.5 font-extrabold text-white">Nota Final</th>
+            <tr class="bg-slate-50 text-slate-500 font-semibold uppercase text-[10px] border-b border-slate-200">
+              <th class="p-2 text-left">Pos.</th>
+              <th class="p-2 text-left">Coordenador</th>
+              <th class="p-2">DDD(s)</th>
+              <th class="p-2 font-bold text-slate-900">Nota Final</th>
             </tr>
           </thead>
-          <tbody id="tbody-coordenadores" class="divide-y divide-slate-800/60">
+          <tbody id="tbody-coordenadores" class="divide-y divide-slate-100 text-slate-700">
             <!-- Injetado via JS -->
           </tbody>
         </table>
       </div>
 
       <!-- Distribuição por Faixa de Nota -->
-      <div class="bg-slate-900 rounded-xl border border-slate-800 p-4 shadow-xl flex-1 flex flex-col justify-between">
-        <h3 class="text-xs font-extrabold uppercase tracking-wide text-slate-300 mb-2 flex items-center gap-1.5">
-          <i class="fa-solid fa-chart-bar text-purple-400"></i> DISTRIBUIÇÃO DOS DDDs POR FAIXA DE NOTA
+      <div class="bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm flex-1 flex flex-col justify-between">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2 flex items-center gap-1.5">
+          <i class="fa-solid fa-chart-pie text-sky-600"></i> DISTRIBUIÇÃO DOS DDDs POR FAIXA
         </h3>
         <div class="h-36 relative">
           <canvas id="chart-faixa-notas"></canvas>
@@ -176,55 +178,55 @@
   </section>
 
   <!-- BLOCO 2 & 3: FICHAS INTERATIVAS DA COORDENAÇÃO E INDIVIDUAL DO DDD -->
-  <section class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+  <section class="grid grid-cols-1 lg:grid-cols-12 gap-5">
     
     <!-- BLOCO 2: FICHA DA COORDENAÇÃO -->
-    <div class="lg:col-span-6 bg-slate-900 rounded-xl border border-slate-800 p-4 shadow-xl space-y-4">
+    <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm space-y-4">
       
       <!-- Header Ficha Coordenação -->
-      <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+      <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
         <div>
-          <h2 class="text-sm font-extrabold uppercase tracking-wide text-emerald-400 flex items-center gap-2">
-            <i class="fa-solid fa-user-tie"></i> 2. FICHA DA COORDENAÇÃO
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-user-tie text-sky-600"></i> 2. FICHA DA COORDENAÇÃO
           </h2>
-          <p class="text-[11px] text-slate-400" id="lbl-coord-sub">Análise detalhada por Coordenador</p>
+          <p class="text-[11px] text-slate-400">Análise agregada dos indicadores do Coordenador</p>
         </div>
-        <select id="select-coordenador" onchange="renderFichaCoordenador()" class="bg-slate-800 border border-slate-700 text-sky-400 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+        <select id="select-coordenador" onchange="renderFichaCoordenador()" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
           <!-- Opções preenchidas via JS -->
         </select>
       </div>
 
-      <!-- Cards de Resultado da Coordenação -->
+      <!-- Cards de Resultado da Coordenação (Estilo Imagem) -->
       <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700/60 text-center">
-          <span class="text-[10px] text-slate-400 font-bold uppercase block">NOTA FINAL DA COORDENAÇÃO</span>
-          <span class="text-2xl font-extrabold text-emerald-400" id="card-coord-nota">0,0 / 100</span>
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 text-center">
+          <span class="text-[10px] text-slate-400 font-semibold uppercase block">NOTA COORDENAÇÃO</span>
+          <span class="text-2xl font-extrabold text-sky-600" id="card-coord-nota">0,0 / 100</span>
         </div>
-        <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700/60 text-center">
-          <span class="text-[10px] text-slate-400 font-bold uppercase block">RANKING ENTRE COORD.</span>
-          <span class="text-xl font-extrabold text-amber-400" id="card-coord-ranking">0º de 5</span>
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 text-center">
+          <span class="text-[10px] text-slate-400 font-semibold uppercase block">RANKING ENTRE COORD.</span>
+          <span class="text-xl font-extrabold text-amber-500" id="card-coord-ranking">0º de 5</span>
         </div>
-        <div class="bg-slate-800/60 p-3 rounded-lg border border-slate-700/60 text-center col-span-2 sm:col-span-1">
-          <span class="text-[10px] text-slate-400 font-bold uppercase block">DDDs SOB RESPONSABILIDADE</span>
-          <span class="text-xs font-extrabold text-purple-300 block mt-1" id="card-coord-ddds">--</span>
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 text-center col-span-2 sm:col-span-1">
+          <span class="text-[10px] text-slate-400 font-semibold uppercase block">DDDs RESPONSÁVEIS</span>
+          <span class="text-xs font-bold text-slate-700 block mt-1" id="card-coord-ddds">--</span>
         </div>
       </div>
 
       <!-- Detalhamento por DDD do Coordenador -->
       <div>
-        <h3 class="text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">Detalhamento dos Indicadores por DDD</h3>
+        <h3 class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Indicadores Agregados por DDD</h3>
         <div class="overflow-x-auto">
           <table class="w-full text-xs text-center border-collapse">
             <thead>
-              <tr class="bg-slate-800 text-slate-400 text-[10px] uppercase font-bold">
-                <th class="p-1.5 text-left">Indicador</th>
-                <th class="p-1.5">Peso</th>
-                <th class="p-1.5 text-left">Meta / Regra</th>
-                <th class="p-1.5 text-sky-400" id="th-coord-ddd1">DDD 1</th>
-                <th class="p-1.5 text-sky-400" id="th-coord-ddd2">DDD 2</th>
+              <tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-semibold border-b border-slate-200">
+                <th class="p-2 text-left">Indicador</th>
+                <th class="p-2">Peso</th>
+                <th class="p-2 text-left">Meta / Regra</th>
+                <th class="p-2 text-sky-600 font-bold" id="th-coord-ddd1">DDD 1</th>
+                <th class="p-2 text-sky-600 font-bold" id="th-coord-ddd2">DDD 2</th>
               </tr>
             </thead>
-            <tbody id="tbody-coord-detalhes" class="divide-y divide-slate-800/60">
+            <tbody id="tbody-coord-detalhes" class="divide-y divide-slate-100 text-slate-700">
               <!-- Injetado via JS -->
             </tbody>
           </table>
@@ -233,18 +235,18 @@
 
       <!-- Evolução e Ações do Coordenador -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-        <div class="bg-slate-800/40 p-2.5 rounded-lg border border-slate-800">
-          <h4 class="text-[11px] font-bold text-slate-300 uppercase mb-2">EVOLUÇÃO DA NOTA DA COORDENAÇÃO</h4>
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+          <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2">EVOLUÇÃO HISTÓRICA</h4>
           <div class="h-28 relative">
             <canvas id="chart-evolucao-coord"></canvas>
           </div>
         </div>
-        <div class="bg-slate-800/40 p-2.5 rounded-lg border border-slate-800 flex flex-col justify-between">
-          <h4 class="text-[11px] font-bold text-slate-300 uppercase mb-1">PRINCIPAIS PONTOS E AÇÕES</h4>
-          <ul class="text-[11px] text-slate-300 space-y-1.5 list-disc pl-4" id="list-coord-acoes">
-            <li>Manter acompanhamento rigoroso de P1 e P2.</li>
-            <li>Zero estouro de Orçamento de HE e Sobreaviso.</li>
-            <li>Garantir 100% das Preventivas executadas e validadas.</li>
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 flex flex-col justify-between">
+          <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-1">PONTOS DE ATENÇÃO & AÇÕES</h4>
+          <ul class="text-[11px] text-slate-600 space-y-1.5 list-disc pl-4" id="list-coord-acoes">
+            <li>Acompanhar índice de P1 e P2.</li>
+            <li>Monitorar limite de Orçamento HE/Sobreaviso.</li>
+            <li>Validar qualidade e execução das Preventivas.</li>
           </ul>
         </div>
       </div>
@@ -252,57 +254,57 @@
     </div>
 
     <!-- BLOCO 3: FICHA INDIVIDUAL DO DDD -->
-    <div class="lg:col-span-6 bg-slate-900 rounded-xl border border-slate-800 p-4 shadow-xl space-y-4">
+    <div class="lg:col-span-6 bg-white rounded-xl border border-slate-200/80 p-5 shadow-sm space-y-4">
       
       <!-- Header Ficha Individual do DDD -->
-      <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800">
+      <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
         <div>
-          <h2 class="text-sm font-extrabold uppercase tracking-wide text-purple-400 flex items-center gap-2">
-            <i class="fa-solid fa-map-location-dot"></i> 3. FICHA INDIVIDUAL DO DDD
+          <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-map-location-dot text-indigo-600"></i> 3. FICHA INDIVIDUAL DO DDD
           </h2>
-          <p class="text-[11px] text-slate-400" id="lbl-ddd-sub">Análise detalhada por praça</p>
+          <p class="text-[11px] text-slate-400">Análise individual da praça selecionada</p>
         </div>
-        <select id="select-ddd" onchange="renderFichaDDD()" class="bg-slate-800 border border-slate-700 text-emerald-400 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-purple-500 focus:outline-none">
+        <select id="select-ddd" onchange="renderFichaDDD()" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs font-semibold rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
           <!-- Opções preenchidas via JS -->
         </select>
       </div>
 
       <!-- Top Stats do DDD -->
       <div class="grid grid-cols-4 gap-2 text-center">
-        <div class="bg-slate-800/60 p-2 rounded-lg border border-slate-700/60">
-          <span class="text-[9px] text-slate-400 font-bold uppercase block">NOTA DO DDD</span>
-          <span class="text-xl font-extrabold text-white" id="card-ddd-nota">0 / 100</span>
+        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
+          <span class="text-[9px] text-slate-400 font-bold uppercase block">NOTA DDD</span>
+          <span class="text-xl font-extrabold text-slate-800" id="card-ddd-nota">0 / 100</span>
         </div>
-        <div class="bg-slate-800/60 p-2 rounded-lg border border-slate-700/60">
-          <span class="text-[9px] text-slate-400 font-bold uppercase block">RANKING DDD</span>
-          <span class="text-xl font-extrabold text-amber-400" id="card-ddd-rank">0º de 8</span>
+        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
+          <span class="text-[9px] text-slate-400 font-bold uppercase block">RANKING</span>
+          <span class="text-xl font-extrabold text-amber-500" id="card-ddd-rank">0º de 8</span>
         </div>
-        <div class="bg-slate-800/60 p-2 rounded-lg border border-slate-700/60">
+        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
           <span class="text-[9px] text-slate-400 font-bold uppercase block">COORDENADOR</span>
-          <span class="text-xs font-bold text-sky-300 block truncate mt-1" id="card-ddd-coord">--</span>
+          <span class="text-xs font-bold text-sky-700 block truncate mt-1" id="card-ddd-coord">--</span>
         </div>
-        <div class="bg-slate-800/60 p-2 rounded-lg border border-slate-700/60 flex items-center justify-center">
+        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 flex items-center justify-center">
           <span class="status-pill status-green" id="card-ddd-status-pill"></span>
-          <span class="text-xs font-bold ml-1.5 text-slate-200" id="card-ddd-status-txt">Meta</span>
+          <span class="text-xs font-bold ml-1.5 text-slate-700" id="card-ddd-status-txt">Meta</span>
         </div>
       </div>
 
       <!-- Desempenho dos Indicadores do DDD -->
       <div>
-        <h3 class="text-xs font-extrabold text-slate-300 uppercase tracking-wider mb-2">Desempenho dos Indicadores no DDD</h3>
+        <h3 class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Desempenho dos Indicadores no DDD</h3>
         <div class="overflow-x-auto">
           <table class="w-full text-xs text-center border-collapse">
             <thead>
-              <tr class="bg-slate-800 text-slate-400 text-[10px] uppercase font-bold">
-                <th class="p-1.5 text-left">Indicador</th>
-                <th class="p-1.5">Peso</th>
-                <th class="p-1.5 text-left">Meta / Regra</th>
-                <th class="p-1.5 text-emerald-400">Resultado Real</th>
-                <th class="p-1.5 font-extrabold text-white">Pontos</th>
-                <th class="p-1.5">Status</th>
+              <tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-semibold border-b border-slate-200">
+                <th class="p-2 text-left">Indicador</th>
+                <th class="p-2">Peso</th>
+                <th class="p-2 text-left">Meta / Regra</th>
+                <th class="p-2 text-sky-700 font-bold">Resultado Real</th>
+                <th class="p-2 font-bold text-slate-900">Pontos</th>
+                <th class="p-2">Status</th>
               </tr>
             </thead>
-            <tbody id="tbody-ddd-indicadores" class="divide-y divide-slate-800/60">
+            <tbody id="tbody-ddd-indicadores" class="divide-y divide-slate-100 text-slate-700">
               <!-- Injetado via JS -->
             </tbody>
           </table>
@@ -311,17 +313,17 @@
 
       <!-- Evolução Semanal e Plano de Ação -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-        <div class="bg-slate-800/40 p-2.5 rounded-lg border border-slate-800">
-          <h4 class="text-[11px] font-bold text-slate-300 uppercase mb-2">EVOLUÇÃO SEMANAL DOS INDICADORES</h4>
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80">
+          <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2">EVOLUÇÃO SEMANAL</h4>
           <div class="h-28 relative">
             <canvas id="chart-evolucao-ddd"></canvas>
           </div>
         </div>
-        <div class="bg-slate-800/40 p-2.5 rounded-lg border border-slate-800 flex flex-col justify-between">
-          <h4 class="text-[11px] font-bold text-slate-300 uppercase mb-1">PRINCIPAIS DESVIOS & PLANO DE AÇÃO</h4>
-          <div class="text-[11px] space-y-1 text-slate-300" id="box-plan-acao">
-            <p><strong>Desvio Observado:</strong> Análise do orçamento e preventivas.</p>
-            <p class="text-emerald-400"><strong>Plano de Ação:</strong> Acompanhamento diário com supervisão técnica de campo.</p>
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/80 flex flex-col justify-between">
+          <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-1">PLANO DE AÇÃO & CAUSAS</h4>
+          <div class="text-[11px] space-y-1 text-slate-600" id="box-plan-acao">
+            <p><strong>Acompanhamento:</strong> Ações direcionadas no plano de campo.</p>
+            <p class="text-emerald-700 font-medium"><strong>Status:</strong> Plano em andamento com supervisão técnica.</p>
           </div>
         </div>
       </div>
@@ -330,9 +332,8 @@
 
   </section>
 
-  <!-- JAVASCRIPT: CONEXÃO GOOGLE SHEETS & PROCESSAMENTO DAS 25 COLUNAS -->
+  <!-- JAVASCRIPT: PAPAPARSE & LÓGICA DE DADOS -->
   <script>
-    // URL CSV DO GOOGLE SHEETS FORNECIDA
     const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vShU66oSm1Q0GBrBINsiaCR64uGW_mP2MLPckpcjyZmjwDJFSaXiamg_D-mGQTlQ7WGmJjcR-CkZCD_/pub?gid=796515673&single=true&output=csv';
 
     let allRowsParsed = [];
@@ -340,7 +341,6 @@
     let coordenadoresData = [];
     let selectedSemana = '';
 
-    // CHARTS
     let chartFaixaNotasInst = null;
     let chartEvolucaoCoordInst = null;
     let chartEvolucaoDDDInst = null;
@@ -349,12 +349,11 @@
       fetchGoogleSheetsData();
     });
 
-    // BUSCA DE DADOS VIA PAPAPARSE
     function fetchGoogleSheetsData() {
       const bannerText = document.getElementById('status-text');
-      const spinner = document.getElementById('status-spinner');
+      const icon = document.getElementById('status-icon');
       
-      spinner.classList.add('fa-spin');
+      icon.className = "fa-solid fa-circle-notch fa-spin text-sky-600";
       bannerText.innerText = "Sincronizando com a Planilha Google Sheets...";
 
       Papa.parse(GOOGLE_SHEETS_CSV_URL, {
@@ -362,28 +361,29 @@
         header: true,
         skipEmptyLines: true,
         complete: function(results) {
-          spinner.classList.remove('fa-spin');
           if (results.data && results.data.length > 0) {
             allRowsParsed = processRawRows(results.data);
             populateSemanaSelector();
             filterBySemana();
-            bannerText.innerHTML = `<strong class="text-emerald-400">Sucesso:</strong> Base sincronizada com ${allRowsParsed.length} registros da Planilha Google!`;
+            
+            icon.className = "fa-solid fa-circle-check text-emerald-600";
+            bannerText.innerHTML = `<strong>Sucesso:</strong> Base sincronizada com ${allRowsParsed.length} registros da Planilha Google!`;
+            document.getElementById('clock-timestamp').innerText = `Hoje às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
           } else {
-            showError("A planilha retornou vazia ou sem estrutura de cabeçalho.");
+            showError("Planilha retornou vazia ou sem estrutura de cabeçalhos.");
           }
         },
         error: function(err) {
-          spinner.classList.remove('fa-spin');
-          showError("Erro ao conectar ao Google Sheets. Verifique o link e permissões.");
+          showError("Erro ao conectar à Planilha Google. Verifique o link e permissões.");
         }
       });
     }
 
     function showError(msg) {
-      document.getElementById('status-text').innerHTML = `<strong class="text-rose-400">Atenção:</strong> ${msg}`;
+      document.getElementById('status-icon').className = "fa-solid fa-circle-exclamation text-rose-600";
+      document.getElementById('status-text').innerHTML = `<strong>Atenção:</strong> ${msg}`;
     }
 
-    // MAPA FLEXÍVEL E PARSE DAS 25 COLUNAS DA PLANILHA
     function processRawRows(rows) {
       return rows.map((r, index) => {
         const getVal = (possibleKeys) => {
@@ -408,19 +408,15 @@
         const regional = getVal(['Regional', 'Praça', 'Praca']) || 'Regional';
         const coordenador = getVal(['Coordenador']) || 'Não informado';
 
-        // Reais
         const p1Real = getVal(['P1 Real']);
         const p2Real = getVal(['P2 Real']);
         const prevExecReal = getVal(['Prev. Exec. (%)', 'Exec. (%)']);
         const prevQualReal = getVal(['Prev. Qual. (%)', 'Qual. (%)']);
         const faturaBReal = getVal(['Fatura B (%)']);
 
-        const orcHE = getVal(['Orçamento HE', 'Orcamento HE']);
+        const orcHE = getVal(['Orçamento HE']);
         const gastoHE = getVal(['Gasto Real HE']);
-        const orcSob = getVal(['Orçamento Sob', 'Orcamento Sob']);
-        const gastoSob = getVal(['Gasto Real Sob']);
 
-        // Pontos Calculados
         const ptsP1 = parseNum(getVal(['Pts P1', 'P1 (30)']));
         const ptsP2 = parseNum(getVal(['Pts P2', 'P2 (10)']));
         const ptsExec = parseNum(getVal(['Pts Exec', 'Exec (5)']));
@@ -429,20 +425,17 @@
         const ptsHESob = parseNum(getVal(['Pts HE/Sob', 'HE/Sob (30)']));
 
         const total = parseNum(getVal(['NOTA TOTAL', 'TOTAL (100)']));
-        const statusMeta = getVal(['STATUS META', 'Status Meta']) || 'Dentro da Meta';
 
         return {
           semana, mesRef, ddd, regional, coordenador,
           p1Real, p2Real, prevExecReal, prevQualReal, faturaBReal,
-          orcHE, gastoHE, orcSob, gastoSob,
+          gastoHE,
           ptsP1, ptsP2, ptsExec, ptsQual, ptsFatB, ptsHESob,
-          total: total || (ptsP1 + ptsP2 + ptsExec + ptsQual + ptsFatB + ptsHESob),
-          statusMeta
+          total: total || (ptsP1 + ptsP2 + ptsExec + ptsQual + ptsFatB + ptsHESob)
         };
       });
     }
 
-    // POPULAR SELECTOR DE SEMANA
     function populateSemanaSelector() {
       const sel = document.getElementById('select-semana');
       const semanas = [...new Set(allRowsParsed.map(r => r.semana))].filter(Boolean);
@@ -453,10 +446,9 @@
         opt.innerText = `Semana ${s}`;
         sel.appendChild(opt);
       });
-      if (semanas.length > 0) sel.value = semanas[semanas.length - 1]; // Seleciona a mais recente
+      if (semanas.length > 0) sel.value = semanas[semanas.length - 1];
     }
 
-    // FILTRAR DADOS PELA SEMANA SELECIONADA
     function filterBySemana() {
       selectedSemana = document.getElementById('select-semana').value;
       dddDataFiltered = allRowsParsed.filter(r => r.semana === selectedSemana);
@@ -465,13 +457,10 @@
         dddDataFiltered = [...allRowsParsed];
       }
 
-      // Ordena por Total Descendente
       dddDataFiltered.sort((a, b) => b.total - a.total);
       dddDataFiltered.forEach((d, idx) => d.rankingDDD = idx + 1);
 
-      // Atualizar Header
       if (dddDataFiltered.length > 0) {
-        document.getElementById('header-periodo').innerText = `Semana: ${dddDataFiltered[0].semana} (${dddDataFiltered[0].mesRef})`;
         document.getElementById('lbl-semana-t1').innerText = `Semana: ${dddDataFiltered[0].semana}`;
         document.getElementById('lbl-total-ddds').innerText = `Total: ${dddDataFiltered.length} DDDs`;
       }
@@ -486,7 +475,6 @@
       renderFichaDDD();
     }
 
-    // CÁLCULO DE NOTA MÉDIA POR COORDENADOR
     function calculateCoordenadoresData() {
       const coordMap = {};
       dddDataFiltered.forEach(d => {
@@ -509,7 +497,6 @@
       coordenadoresData.forEach((c, idx) => c.posicao = idx + 1);
     }
 
-    // POPULAR SELECTS DE COORDENADOR E DDD
     function populateSelects() {
       const selCoord = document.getElementById('select-coordenador');
       selCoord.innerHTML = '';
@@ -530,57 +517,54 @@
       });
     }
 
-    // RENDERIZAR TABELA 1: DESEMPENHO POR DDD
     function renderTabelaSemanal() {
       const tbody = document.getElementById('tbody-ddd-semanal');
       tbody.innerHTML = '';
 
       dddDataFiltered.forEach(d => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-800/80 transition border-b border-slate-800/50";
+        tr.className = "hover:bg-slate-50/80 transition border-b border-slate-100";
 
         let statusClass = "status-green";
         if (d.total < 70) statusClass = "status-red";
         else if (d.total < 85) statusClass = "status-yellow";
 
         tr.innerHTML = `
-          <td class="p-2 text-left font-extrabold text-white">${d.ddd}</td>
-          <td class="p-2 text-left text-slate-300">${d.regional}</td>
-          <td class="p-2 text-left text-sky-300">${d.coordenador}</td>
-          <td class="p-2 font-bold text-emerald-400">${d.ptsP1}</td>
-          <td class="p-2 font-bold text-emerald-400">${d.ptsP2}</td>
-          <td class="p-2 font-bold text-sky-400">${d.ptsExec}</td>
-          <td class="p-2 font-bold text-sky-400">${d.ptsQual}</td>
-          <td class="p-2 font-bold text-amber-400">${d.ptsFatB}</td>
-          <td class="p-2 font-bold text-purple-400">${d.ptsHESob}</td>
-          <td class="p-2 font-extrabold text-white bg-slate-800/80 text-sm">${d.total.toFixed(0)}</td>
-          <td class="p-2 font-bold text-slate-300">${d.rankingDDD}º</td>
-          <td class="p-2"><span class="status-pill ${statusClass}"></span></td>
+          <td class="p-2.5 text-left font-bold text-slate-900">${d.ddd}</td>
+          <td class="p-2.5 text-left text-slate-600">${d.regional}</td>
+          <td class="p-2.5 text-left font-medium text-sky-700">${d.coordenador}</td>
+          <td class="p-2.5 font-semibold text-slate-800">${d.ptsP1}</td>
+          <td class="p-2.5 font-semibold text-slate-800">${d.ptsP2}</td>
+          <td class="p-2.5 font-semibold text-slate-800">${d.ptsExec}</td>
+          <td class="p-2.5 font-semibold text-slate-800">${d.ptsQual}</td>
+          <td class="p-2.5 font-semibold text-slate-800">${d.ptsFatB}</td>
+          <td class="p-2.5 font-semibold text-slate-800">${d.ptsHESob}</td>
+          <td class="p-2.5 font-extrabold text-slate-900 bg-slate-100/80 text-sm">${d.total.toFixed(0)}</td>
+          <td class="p-2.5 font-bold text-slate-600">${d.rankingDDD}º</td>
+          <td class="p-2.5"><span class="status-pill ${statusClass}"></span></td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    // RENDERIZAR TABELA COORDENADORES
     function renderTabelaCoordenadores() {
       const tbody = document.getElementById('tbody-coordenadores');
       tbody.innerHTML = '';
 
       coordenadoresData.forEach(c => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-800/80 transition";
+        tr.className = "hover:bg-slate-50/80 transition border-b border-slate-100";
 
         tr.innerHTML = `
-          <td class="p-1.5 text-left font-bold text-amber-400">${c.posicao}º</td>
-          <td class="p-1.5 text-left font-bold text-slate-200">${c.coordenador}</td>
-          <td class="p-1.5 text-slate-400">${c.ddds}</td>
-          <td class="p-1.5 font-extrabold text-emerald-400 text-sm">${c.notaFinal.toFixed(1)}</td>
+          <td class="p-2 text-left font-bold text-amber-500">${c.posicao}º</td>
+          <td class="p-2 text-left font-medium text-slate-800">${c.coordenador}</td>
+          <td class="p-2 text-slate-500">${c.ddds}</td>
+          <td class="p-2 font-extrabold text-emerald-600 text-sm">${c.notaFinal.toFixed(1)}</td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    // RENDERIZAR GRÁFICO DE DISTRIBUIÇÃO DAS NOTAS
     function renderChartFaixaNotas() {
       const excelente = dddDataFiltered.filter(d => d.total >= 90).length;
       const dentroMeta = dddDataFiltered.filter(d => d.total >= 70 && d.total < 90).length;
@@ -596,7 +580,7 @@
           labels: ['90-100 (Excelente)', '70-89 (Dentro)', '50-69 (Atenção)', '<50 (Crítico)'],
           datasets: [{
             data: [excelente, dentroMeta, atencao, critico],
-            backgroundColor: ['#22c55e', '#eab308', '#f97316', '#ef4444'],
+            backgroundColor: ['#10b981', '#f59e0b', '#f97316', '#f43f5e'],
             borderRadius: 4
           }]
         },
@@ -606,14 +590,13 @@
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            x: { beginAtZero: true, grid: { color: '#1e293b' }, ticks: { stepSize: 1, color: '#94a3b8' } },
-            y: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { size: 10 } } }
+            x: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1, color: '#64748b' } },
+            y: { grid: { display: false }, ticks: { color: '#475569', font: { size: 10 } } }
           }
         }
       });
     }
 
-    // RENDERIZAR BLOCO 2: FICHA DA COORDENAÇÃO
     function renderFichaCoordenador() {
       const name = document.getElementById('select-coordenador').value;
       const coordObj = coordenadoresData.find(c => c.coordenador === name) || coordenadoresData[0];
@@ -645,22 +628,21 @@
 
       rowsDef.forEach(r => {
         const tr = document.createElement('tr');
-        tr.className = r.isTotal ? "bg-slate-800/80 font-extrabold text-white" : "hover:bg-slate-800/40 text-slate-300";
+        tr.className = r.isTotal ? "bg-slate-100 font-bold text-slate-900" : "hover:bg-slate-50 text-slate-600 border-b border-slate-100";
         
         const val1 = dddsCoord[0] ? (r.isTotal ? dddsCoord[0][r.k].toFixed(0) : dddsCoord[0][r.k]) : '--';
         const val2 = dddsCoord[1] ? (r.isTotal ? dddsCoord[1][r.k].toFixed(0) : dddsCoord[1][r.k]) : '--';
 
         tr.innerHTML = `
-          <td class="p-1.5 text-left font-bold ${r.isTotal ? 'text-emerald-400' : ''}">${r.name}</td>
+          <td class="p-1.5 text-left font-medium ${r.isTotal ? 'text-sky-700' : ''}">${r.name}</td>
           <td class="p-1.5 text-slate-400">${r.peso}</td>
           <td class="p-1.5 text-left text-slate-400 text-[10px]">${r.meta}</td>
-          <td class="p-1.5 font-bold ${r.isTotal ? 'text-emerald-400 text-sm' : 'text-sky-300'}">${val1}</td>
-          <td class="p-1.5 font-bold ${r.isTotal ? 'text-emerald-400 text-sm' : 'text-sky-300'}">${val2}</td>
+          <td class="p-1.5 font-bold ${r.isTotal ? 'text-emerald-600 text-sm' : 'text-slate-800'}">${val1}</td>
+          <td class="p-1.5 font-bold ${r.isTotal ? 'text-emerald-600 text-sm' : 'text-slate-800'}">${val2}</td>
         `;
         tbody.appendChild(tr);
       });
 
-      // Chart Evolução Coord
       const ctx = document.getElementById('chart-evolucao-coord').getContext('2d');
       if (chartEvolucaoCoordInst) chartEvolucaoCoordInst.destroy();
 
@@ -671,8 +653,8 @@
           datasets: [{
             label: 'Nota Coordenação',
             data: [coordObj.notaFinal - 6, coordObj.notaFinal - 4, coordObj.notaFinal - 2, coordObj.notaFinal - 1, coordObj.notaFinal],
-            borderColor: '#38bdf8',
-            backgroundColor: 'rgba(56, 189, 248, 0.1)',
+            borderColor: '#0284c7',
+            backgroundColor: 'rgba(2, 132, 199, 0.1)',
             fill: true,
             tension: 0.3
           }]
@@ -682,14 +664,13 @@
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { min: 40, max: 100, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 9 } } },
-            x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 9 } } }
+            y: { min: 40, max: 100, grid: { color: '#f1f5f9' }, ticks: { color: '#64748b', font: { size: 9 } } },
+            x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } }
           }
         }
       });
     }
 
-    // RENDERIZAR BLOCO 3: FICHA INDIVIDUAL DO DDD
     function renderFichaDDD() {
       const dddVal = document.getElementById('select-ddd').value;
       const dddObj = dddDataFiltered.find(d => d.ddd === dddVal) || dddDataFiltered[0];
@@ -727,7 +708,7 @@
 
       listInd.forEach(i => {
         const tr = document.createElement('tr');
-        tr.className = i.isTotal ? "bg-slate-800/80 font-extrabold text-white" : "hover:bg-slate-800/40 text-slate-300";
+        tr.className = i.isTotal ? "bg-slate-100 font-bold text-slate-900" : "hover:bg-slate-50 text-slate-600 border-b border-slate-100";
 
         let stClass = "status-green";
         if (!i.isTotal) {
@@ -736,17 +717,16 @@
         }
 
         tr.innerHTML = `
-          <td class="p-1.5 text-left font-bold ${i.isTotal ? 'text-purple-400' : ''}">${i.name}</td>
+          <td class="p-1.5 text-left font-medium ${i.isTotal ? 'text-indigo-700' : ''}">${i.name}</td>
           <td class="p-1.5 text-slate-400">${i.peso}</td>
           <td class="p-1.5 text-left text-slate-400 text-[10px]">${i.meta}</td>
-          <td class="p-1.5 text-sky-300 font-semibold">${i.real || '-'}</td>
-          <td class="p-1.5 font-bold ${i.isTotal ? 'text-purple-400 text-sm' : 'text-emerald-400'}">${i.pts} / ${i.max}</td>
+          <td class="p-1.5 text-sky-700 font-semibold">${i.real || '-'}</td>
+          <td class="p-1.5 font-bold ${i.isTotal ? 'text-emerald-600 text-sm' : 'text-slate-800'}">${i.pts} / ${i.max}</td>
           <td class="p-1.5"><span class="status-pill ${stClass}"></span></td>
         `;
         tbody.appendChild(tr);
       });
 
-      // Chart Evolução DDD
       const ctx = document.getElementById('chart-evolucao-ddd').getContext('2d');
       if (chartEvolucaoDDDInst) chartEvolucaoDDDInst.destroy();
 
@@ -757,8 +737,8 @@
           datasets: [{
             label: 'Evolução DDD',
             data: [dddObj.total - 10, dddObj.total - 7, dddObj.total - 4, dddObj.total - 2, dddObj.total],
-            borderColor: '#a855f7',
-            backgroundColor: 'rgba(168, 85, 247, 0.1)',
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99, 102, 241, 0.1)',
             fill: true,
             tension: 0.3
           }]
@@ -768,8 +748,8 @@
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
           scales: {
-            y: { min: 20, max: 100, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 9 } } },
-            x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 9 } } }
+            y: { min: 20, max: 100, grid: { color: '#f1f5f9' }, ticks: { color: '#64748b', font: { size: 9 } } },
+            x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } }
           }
         }
       });
