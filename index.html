@@ -39,6 +39,7 @@
     .status-red { background-color: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.5); }
     
     .cell-good { background-color: #e6f7ed; color: #166534; font-weight: 600; }
+    .cell-warning { background-color: #fef9c3; color: #854d0e; font-weight: 600; }
     .cell-bad { background-color: #fde8e8; color: #991b1b; font-weight: 600; }
     .cell-neutral { background-color: #ffffff; color: #334155; }
     
@@ -674,7 +675,12 @@
         if (d.total < 70) statusClass = "status-red";
         else if (d.total < 85) statusClass = "status-yellow";
 
-        const getCellClass = (pts, max) => pts === max ? 'cell-good' : (pts === 0 ? 'cell-bad' : 'cell-neutral');
+        // FUNÇÃO ATUALIZADA: VERDE PARA PONTUAÇÃO MÁXIMA, VERMELHO PARA ZERO E AMARELO PARA PONTOS INTERMEDIÁRIOS
+        const getCellClass = (pts, max) => {
+          if (pts === max) return 'cell-good';
+          if (pts === 0) return 'cell-bad';
+          return 'cell-warning';
+        };
 
         tr.innerHTML = `
           <td class="p-2 text-left font-bold text-slate-900 border-r border-slate-200/60">${d.ddd}</td>
@@ -884,8 +890,8 @@
 
         let stClass = "status-green";
         if (!i.isTotal) {
-          if (i.pts < i.max * 0.7) stClass = "status-red";
-          else if (i.pts < i.max * 0.85) stClass = "status-yellow";
+          if (i.pts === 0) stClass = "status-red";
+          else if (i.pts < i.max) stClass = "status-yellow";
         }
 
         tr.innerHTML = `
