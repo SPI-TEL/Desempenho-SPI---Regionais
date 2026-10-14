@@ -168,7 +168,7 @@
               <th class="p-2 border-r border-slate-700/60 text-left" rowspan="2">Coordenador</th>
               <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">P1<br><span class="text-sky-300 font-normal">30 pts</span></th>
               <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">P2<br><span class="text-sky-300 font-normal">10 pts</span></th>
-              <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">Prev. Execução<br><span class="text-sky-300 font-normal">5 pts</span></th>
+              <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">NC/COR (Perda SLA)<br><span class="text-sky-300 font-normal">5 pts</span></th>
               <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">Prev. Qualidade<br><span class="text-sky-300 font-normal">5 pts</span></th>
               <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">Fatura B<br><span class="text-sky-300 font-normal">20 pts</span></th>
               <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="4">HE + Sobreaviso<br><span class="text-sky-300 font-normal">30 pts</span></th>
@@ -181,7 +181,7 @@
               <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
               <th class="p-1 border-r border-slate-600/50">Resultado</th>
               <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
-              <th class="p-1 border-r border-slate-600/50">Resultado</th>
+              <th class="p-1 border-r border-slate-600/50">Qtd NC/COR</th>
               <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
               <th class="p-1 border-r border-slate-600/50">Resultado</th>
               <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
@@ -200,7 +200,7 @@
       </div>
 
       <div class="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
-        <span>Pesos: P1 (30%) | P2 (10%) | Prev. Exec (5%) | Prev. Qual (5%) | Fatura B (20%) | HE+Sob (30%)</span>
+        <span>Pesos: P1 (30%) | P2 (10%) | NC/COR (5%) | Prev. Qual (5%) | Fatura B (20%) | HE+Sob (30%)</span>
         <span id="lbl-total-ddds">Total: 8 DDDs</span>
       </div>
     </section>
@@ -300,8 +300,9 @@
             <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-1">PONTOS DE ATENÇÃO & AÇÕES</h4>
             <ul class="text-[11px] text-slate-600 space-y-1.5 list-disc pl-4" id="list-coord-acoes">
               <li>Acompanhar índice de P1 e P2.</li>
+              <li>Monitorar ocorrências de NC/COR (Perda SLA).</li>
               <li>Monitorar limite de Orçamento HE/Sobreaviso.</li>
-              <li>Validar qualidade e execução das Preventivas.</li>
+              <li>Validar qualidade das Preventivas.</li>
             </ul>
           </div>
         </div>
@@ -447,7 +448,6 @@
       const pInput = document.getElementById('login-pass').value.trim();
       const alertBox = document.getElementById('login-alert');
 
-      // Procura primeiro no Google Sheets e depois usa fallback local se estiver carregando
       const match = usuariosLive.find(u => u.user.toLowerCase() === uInput.toLowerCase() && u.pass === pInput);
 
       if (match) {
@@ -493,7 +493,6 @@
             
             icon.className = "fa-solid fa-circle-check text-emerald-600";
             bannerText.innerHTML = `<strong>Sucesso:</strong> Base sincronizada com ${allRowsParsed.length} registros da Planilha Google!`;
-            document.getElementById('clock-timestamp').innerText = `${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
           } else {
             showError("Planilha retornou vazia ou sem estrutura de cabeçalhos.");
           }
@@ -535,7 +534,11 @@
 
         const p1Real = getVal(['P1 Real', 'P1 Resultado']) || '0%';
         const p2Real = getVal(['P2 Real', 'P2 Resultado']) || '0%';
-        const prevExecReal = getVal(['Prev. Exec. (%)', 'Exec. Resultado', 'Exec. (%)']) || '0%';
+        
+        // NOVO MAPEAMENTO PARA NC/COR (PERDA SLA) - NUMÉRICO
+        const ncCorRaw = getVal(['NC/COR (Perda SLA)', 'NC/COR', 'Perda SLA']);
+        const ncCorReal = ncCorRaw !== '' ? parseInt(parseNum(ncCorRaw)) : 0;
+
         const prevQualReal = getVal(['Prev. Qual. (%)', 'Qual. Resultado', 'Qual. (%)']) || '0%';
         const faturaBReal = getVal(['Fatura B (%)', 'Fatura B Resultado']) || '0%';
 
@@ -545,7 +548,7 @@
 
         const ptsP1 = parseNum(getVal(['Pts P1', 'P1 (30)', 'P1 Pts']));
         const ptsP2 = parseNum(getVal(['Pts P2', 'P2 (10)', 'P2 Pts']));
-        const ptsExec = parseNum(getVal(['Pts Exec', 'Exec (5)', 'Exec Pts']));
+        const ptsExec = parseNum(getVal(['Pts Exec', 'Exec (5)', 'Exec Pts', 'Pts NC/COR', 'NC/COR (5)']));
         const ptsQual = parseNum(getVal(['Pts Qual', 'Qual (5)', 'Qual Pts']));
         const ptsFatB = parseNum(getVal(['Pts FatB', 'FatB (20)', 'FatB Pts']));
         const ptsHESob = parseNum(getVal(['Pts HE/Sob', 'HE/Sob (30)', 'HE Pts']));
@@ -554,7 +557,7 @@
 
         return {
           semana, mesRef, ddd, regional, coordenador,
-          p1Real, p2Real, prevExecReal, prevQualReal, faturaBReal,
+          p1Real, p2Real, ncCorReal, prevQualReal, faturaBReal,
           orcHE, gastoHE, varHE,
           ptsP1, ptsP2, ptsExec, ptsQual, ptsFatB, ptsHESob,
           total: total || (ptsP1 + ptsP2 + ptsExec + ptsQual + ptsFatB + ptsHESob)
@@ -684,7 +687,7 @@
           <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsP2, 10)}">${d.p2Real}</td>
           <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsP2, 10)}">${d.ptsP2}</td>
           
-          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsExec, 5)}">${d.prevExecReal}</td>
+          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsExec, 5)}">${d.ncCorReal}</td>
           <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsExec, 5)}">${d.ptsExec}</td>
           
           <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsQual, 5)}">${d.prevQualReal}</td>
@@ -778,7 +781,7 @@
       const rowsDef = [
         { name: 'P1', peso: '30%', meta: '≥ 80% (≥85% = 30 pts)', k: 'ptsP1' },
         { name: 'P2', peso: '10%', meta: '≥ 70% (≥75% = 10 pts)', k: 'ptsP2' },
-        { name: 'Prev. Execução', peso: '5%', meta: '100% = 5 pts', k: 'ptsExec' },
+        { name: 'NC/COR (Perda SLA)', peso: '5%', meta: '0 Ocorrências = 5 pts', k: 'ptsExec' },
         { name: 'Prev. Qualidade', peso: '5%', meta: '≥ 95% (≥99% = 5 pts)', k: 'ptsQual' },
         { name: 'Fatura B', peso: '20%', meta: '≥ 100% = 20 pts', k: 'ptsFatB' },
         { name: 'HE + Sobreaviso', peso: '30%', meta: '≤ Orçamento', k: 'ptsHESob' },
@@ -868,7 +871,7 @@
       const listInd = [
         { name: 'P1', peso: '30%', meta: '≥ 80% (≥85% = 30 pts)', real: dddObj.p1Real, pts: dddObj.ptsP1, max: 30 },
         { name: 'P2', peso: '10%', meta: '≥ 70% (≥75% = 10 pts)', real: dddObj.p2Real, pts: dddObj.ptsP2, max: 10 },
-        { name: 'Preventiva - Execução', peso: '5%', meta: '100% = 5 pts', real: dddObj.prevExecReal, pts: dddObj.ptsExec, max: 5 },
+        { name: 'NC/COR (Perda SLA)', peso: '5%', meta: '0 Ocorrências = 5 pts', real: dddObj.ncCorReal, pts: dddObj.ptsExec, max: 5 },
         { name: 'Preventiva - Qualidade', peso: '5%', meta: '≥ 95% (≥99% = 5 pts)', real: dddObj.prevQualReal, pts: dddObj.ptsQual, max: 5 },
         { name: 'Fatura B', peso: '20%', meta: '≥ 100% = 20 pts', real: dddObj.faturaBReal, pts: dddObj.ptsFatB, max: 20 },
         { name: 'HE + Sobreaviso', peso: '30%', meta: '≤ Orçamento', real: dddObj.gastoHE ? `${dddObj.gastoHE}` : 'No Orçamento', pts: dddObj.ptsHESob, max: 30 },
@@ -889,7 +892,7 @@
           <td class="p-1.5 text-left font-medium ${i.isTotal ? 'text-indigo-700' : ''}">${i.name}</td>
           <td class="p-1.5 text-slate-400">${i.peso}</td>
           <td class="p-1.5 text-left text-slate-400 text-[10px]">${i.meta}</td>
-          <td class="p-1.5 text-sky-700 font-semibold">${i.real || '-'}</td>
+          <td class="p-1.5 text-sky-700 font-semibold">${i.real !== undefined ? i.real : '-'}</td>
           <td class="p-1.5 font-bold ${i.isTotal ? 'text-emerald-600 text-sm' : 'text-slate-800'}">${i.pts} / ${i.max}</td>
           <td class="p-1.5"><span class="status-pill ${stClass}"></span></td>
         `;
