@@ -50,45 +50,8 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-  <!-- ================= TELA DE LOGIN (PROTEÇÃO INICIAL) ================= -->
-  <div id="login-screen" class="fixed inset-0 bg-[#0b2341] z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl space-y-6 relative overflow-hidden border border-slate-200">
-      
-      <div class="text-center space-y-2">
-        <div class="w-16 h-16 bg-sky-500 text-white rounded-2xl flex items-center justify-center mx-auto shadow-md">
-          <i class="fa-solid fa-shield-halved text-3xl"></i>
-        </div>
-        <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">CONTRATO VIVO - SPI</h2>
-        <p class="text-xs text-slate-500 font-medium">Painel Gerencial de Desempenho Operacional</p>
-      </div>
-
-      <form onsubmit="handleLogin(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Usuário</label>
-          <div class="relative">
-            <i class="fa-solid fa-user absolute left-3 top-3 text-slate-400 text-xs"></i>
-            <input type="text" id="login-user" required placeholder="Digite seu usuário..." class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg text-slate-800 font-medium focus:ring-2 focus:ring-sky-500 focus:outline-none">
-          </div>
-        </div>
-
-        <div id="login-alert" class="hidden text-xs bg-rose-50 text-rose-700 border border-rose-200 p-2.5 rounded-lg text-center font-medium">
-          <i class="fa-solid fa-triangle-exclamation mr-1"></i> Usuário não encontrado!
-        </div>
-
-        <button type="submit" id="btn-login" class="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-lg shadow-md transition flex items-center justify-center gap-2">
-          <span>Entrar no Portal</span>
-          <i class="fa-solid fa-arrow-right"></i>
-        </button>
-      </form>
-
-      <div class="pt-4 border-t border-slate-100 text-center text-[10px] text-slate-400">
-        Acesso restrito à supervisão e coordenação SPI • Validação ao vivo
-      </div>
-    </div>
-  </div>
-
   <!-- ================= PORTAL GERENCIAL PRINCIPAL ================= -->
-  <div id="app-portal" class="hidden min-h-screen flex flex-col p-3 md:p-5 gap-4">
+  <div id="app-portal" class="min-h-screen flex flex-col p-3 md:p-5 gap-4">
 
     <!-- TOP HEADER -->
     <header class="bg-[#0b2341] text-white rounded-xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-md">
@@ -105,22 +68,14 @@
         </div>
       </div>
 
-      <!-- Actions e Perfil -->
+      <!-- Actions -->
       <div class="flex items-center gap-3">
-        <div class="text-right hidden sm:block">
-          <p class="text-[10px] text-slate-300 uppercase tracking-wider font-semibold">Usuário Conectado</p>
-          <p class="text-xs font-bold text-emerald-400" id="user-display-name">--</p>
-        </div>
-
         <select id="select-semana" onchange="filterBySemana()" class="bg-slate-800 border border-slate-700 text-sky-300 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
           <!-- Injetado via JS -->
         </select>
 
         <button onclick="fetchGoogleSheetsData()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-sm flex items-center gap-1.5 transition">
           <i class="fa-solid fa-rotate text-xs"></i> Sincronizar
-        </button>
-        <button onclick="handleLogout()" class="px-3 py-2 bg-rose-700 hover:bg-rose-600 text-white rounded-lg text-xs font-bold shadow-sm flex items-center gap-1.5 transition" title="Sair do Portal">
-          <i class="fa-solid fa-right-from-bracket"></i> Sair
         </button>
       </div>
     </header>
@@ -375,15 +330,11 @@
 
   </div>
 
-  <!-- JAVASCRIPT: LOGINS DO GOOGLE SHEETS & DASHBOARD -->
+  <!-- JAVASCRIPT: GOOGLE SHEETS & DASHBOARD -->
   <script>
-    // URL CSV DA ABA 'USUARIOS'
-    const GOOGLE_SHEETS_USUARIOS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vShU66oSm1Q0GBrBINsiaCR64uGW_mP2MLPckpcjyZmjwDJFSaXiamg_D-mGQTlQ7WGmJjcR-CkZCD_/pub?gid=1025153891&single=true&output=csv';
-
     // URL CSV DA BASE 'DESEMPENHO'
     const GOOGLE_SHEETS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vShU66oSm1Q0GBrBINsiaCR64uGW_mP2MLPckpcjyZmjwDJFSaXiamg_D-mGQTlQ7WGmJjcR-CkZCD_/pub?gid=796515673&single=true&output=csv';
 
-    let usuariosLive = [];
     let allRowsParsed = [];
     let dddDataFiltered = [];
     let coordenadoresData = [];
@@ -395,75 +346,10 @@
     let chartEvolucaoDDDInst = null;
 
     window.addEventListener('DOMContentLoaded', () => {
-      fetchUsuariosData();
-      checkExistingSession();
+      fetchGoogleSheetsData();
     });
 
-    // 1. CARREGAR USUÁRIOS DA ABA USUARIOS
-    function fetchUsuariosData() {
-      Papa.parse(GOOGLE_SHEETS_USUARIOS_URL, {
-        download: true,
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-          if (results.data && results.data.length > 0) {
-            usuariosLive = results.data.map(u => {
-              const getUVal = (keys) => {
-                for (let k of Object.keys(u)) {
-                  if (keys.some(key => k.toLowerCase().trim().includes(key.toLowerCase()))) {
-                    return u[k] ? u[k].toString().trim() : '';
-                  }
-                }
-                return '';
-              };
-              return {
-                user: getUVal(['Usuario', 'User']),
-                nome: getUVal(['Nome']) || 'Usuário SPI'
-              };
-            });
-          }
-        }
-      });
-    }
-
-    // 2. CONTROLE DE SESSÃO E LOGIN
-    function checkExistingSession() {
-      const activeUser = sessionStorage.getItem('spi_session_user');
-      if (activeUser) {
-        showPortal(activeUser);
-      }
-    }
-
-    function handleLogin(e) {
-      e.preventDefault();
-      const uInput = document.getElementById('login-user').value.trim();
-      const alertBox = document.getElementById('login-alert');
-
-      const match = usuariosLive.find(u => u.user.toLowerCase() === uInput.toLowerCase());
-
-      if (match) {
-        alertBox.classList.add('hidden');
-        sessionStorage.setItem('spi_session_user', match.nome);
-        showPortal(match.nome);
-      } else {
-        alertBox.classList.remove('hidden');
-      }
-    }
-
-    function handleLogout() {
-      sessionStorage.removeItem('spi_session_user');
-      document.getElementById('login-screen').classList.remove('hidden');
-      document.getElementById('app-portal').classList.add('hidden');
-    }
-
-    function showPortal(userName) {
-      document.getElementById('login-screen').classList.add('hidden');
-      document.getElementById('app-portal').classList.remove('hidden');
-      document.getElementById('user-display-name').innerText = userName;
-      fetchGoogleSheetsData();
-    }
-
-    // 3. CARREGAR E PROCESSAR DADOS DE DESEMPENHO
+    // CARREGAR E PROCESSAR DADOS DE DESEMPENHO
     function fetchGoogleSheetsData() {
       const bannerText = document.getElementById('status-text');
       const icon = document.getElementById('status-icon');
