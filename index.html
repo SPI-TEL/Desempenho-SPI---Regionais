@@ -33,7 +33,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     body { font-family: 'Inter', sans-serif; background-color: #f0f4f8; color: #1e293b; }
-    .status-pill { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; }
+    .status-pill { display: inline-flex; align-items: center; justify-content: center; width: 11px; height: 11px; border-radius: 50%; }
     .status-green { background-color: #22c55e; box-shadow: 0 0 6px rgba(34, 197, 94, 0.5); }
     .status-yellow { background-color: #eab308; box-shadow: 0 0 6px rgba(234, 179, 8, 0.5); }
     .status-red { background-color: #ef4444; box-shadow: 0 0 6px rgba(239, 68, 68, 0.5); }
@@ -100,37 +100,37 @@
       </div>
 
       <div class="overflow-x-auto mt-3">
-        <table class="w-full text-center border-collapse text-xs">
+        <table class="w-full text-center border-collapse text-[11px] whitespace-nowrap">
           <thead>
             <tr class="bg-[#0b2341] text-white font-bold uppercase text-[10px] tracking-wider border-b border-slate-700">
-              <th class="p-2 border-r border-slate-700/60 text-left" rowspan="2">DDD</th>
-              <th class="p-2 border-r border-slate-700/60 text-left" rowspan="2">Regional</th>
-              <th class="p-2 border-r border-slate-700/60 text-left" rowspan="2">Coordenador</th>
-              <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">P1<br><span class="text-sky-300 font-normal">30 pts</span></th>
-              <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">P2<br><span class="text-sky-300 font-normal">10 pts</span></th>
-              <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">NC/COR (Perda SLA)<br><span class="text-sky-300 font-normal">5 pts</span></th>
-              <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">Prev. Qualidade<br><span class="text-sky-300 font-normal">5 pts</span></th>
-              <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="2">Fatura B<br><span class="text-sky-300 font-normal">20 pts</span></th>
-              <th class="p-2 border-r border-slate-700/60 bg-[#123358]" colspan="4">HE + Sobreaviso<br><span class="text-sky-300 font-normal">30 pts</span></th>
-              <th class="p-2 border-r border-slate-700/60 bg-[#1e4870] font-extrabold text-white text-sm" rowspan="2">Total<br>(100)</th>
-              <th class="p-2 border-r border-slate-700/60" rowspan="2">Ranking<br>DDD</th>
-              <th class="p-2" rowspan="2">Status</th>
+              <th class="px-2 py-2 border-r border-slate-700/60 text-left" rowspan="2">DDD</th>
+              <th class="px-2 py-2 border-r border-slate-700/60 text-left" rowspan="2">Regional</th>
+              <th class="px-2 py-2 border-r border-slate-700/60 text-left" rowspan="2">Coordenador</th>
+              <th class="px-2 py-1.5 border-r border-slate-700/60 bg-[#123358]" colspan="2">P1<br><span class="text-sky-300 font-normal">30 pts</span></th>
+              <th class="px-2 py-1.5 border-r border-slate-700/60 bg-[#123358]" colspan="2">P2<br><span class="text-sky-300 font-normal">10 pts</span></th>
+              <th class="px-2 py-1.5 border-r border-slate-700/60 bg-[#123358]" colspan="2">NC/COR (Perda SLA)<br><span class="text-sky-300 font-normal">5 pts</span></th>
+              <th class="px-2 py-1.5 border-r border-slate-700/60 bg-[#123358]" colspan="2">Prev. Qualidade<br><span class="text-sky-300 font-normal">5 pts</span></th>
+              <th class="px-2 py-1.5 border-r border-slate-700/60 bg-[#123358]" colspan="2">Fatura B<br><span class="text-sky-300 font-normal">20 pts</span></th>
+              <th class="px-2 py-1.5 border-r border-slate-700/60 bg-[#123358]" colspan="4">HE + Sobreaviso<br><span class="text-sky-300 font-normal">30 pts</span></th>
+              <th class="px-2 py-2 border-r border-slate-700/60 bg-[#1e4870] font-extrabold text-white text-xs" rowspan="2">Total<br>(100)</th>
+              <th class="px-2 py-2 border-r border-slate-700/60" rowspan="2">Ranking<br>DDD</th>
+              <th class="px-2 py-2" rowspan="2">Status</th>
             </tr>
             <tr class="bg-[#123358] text-slate-200 font-semibold text-[9px] uppercase tracking-wider border-b border-slate-300">
-              <th class="p-1 border-r border-slate-600/50">Resultado</th>
-              <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
-              <th class="p-1 border-r border-slate-600/50">Resultado</th>
-              <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
-              <th class="p-1 border-r border-slate-600/50">Qtd NC/COR</th>
-              <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
-              <th class="p-1 border-r border-slate-600/50">Resultado</th>
-              <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
-              <th class="p-1 border-r border-slate-600/50">Resultado</th>
-              <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
-              <th class="p-1 border-r border-slate-600/50">Objetivo</th>
-              <th class="p-1 border-r border-slate-600/50">Realizado</th>
-              <th class="p-1 border-r border-slate-600/50">Variação</th>
-              <th class="p-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
+              <th class="px-1.5 py-1 border-r border-slate-600/50">Resultado</th>
+              <th class="px-1.5 py-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
+              <th class="px-1.5 py-1 border-r border-slate-600/50">Resultado</th>
+              <th class="px-1.5 py-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
+              <th class="px-1.5 py-1 border-r border-slate-600/50">Qtd NC/COR</th>
+              <th class="px-1.5 py-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
+              <th class="px-1.5 py-1 border-r border-slate-600/50">Resultado</th>
+              <th class="px-1.5 py-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
+              <th class="px-1.5 py-1 border-r border-slate-600/50">Resultado</th>
+              <th class="px-1.5 py-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
+              <th class="px-1.5 py-1 border-r border-slate-600/50">Objetivo</th>
+              <th class="px-1.5 py-1 border-r border-slate-600/50">Realizado</th>
+              <th class="px-1.5 py-1 border-r border-slate-600/50">Variação</th>
+              <th class="px-1.5 py-1 border-r border-slate-600/50 font-bold text-emerald-300">Pts</th>
             </tr>
           </thead>
           <tbody id="tbody-ddd-semanal" class="divide-y divide-slate-200 text-slate-800">
@@ -357,7 +357,6 @@
         complete: function(results) {
           syncIcon.classList.remove('fa-spin');
           if (results.data && results.data.length > 0) {
-            // Extrai o valor da célula Z2 (índice 25 da primeira linha de dados, ou cabeçalho correspondente)
             const firstRow = results.data[0];
             const keys = Object.keys(firstRow);
             let valorZ2 = '';
@@ -366,7 +365,6 @@
             if (keys.length > 25 && firstRow[keys[25]]) {
               valorZ2 = firstRow[keys[25]].toString().trim();
             } else {
-              // Fallback caso a coluna tenha nome específico como "Atualização" ou "Base atualizada"
               const keyAtualizacao = keys.find(k => k.toLowerCase().includes('atualiz'));
               if (keyAtualizacao && firstRow[keyAtualizacao]) {
                 valorZ2 = firstRow[keyAtualizacao].toString().trim();
@@ -569,33 +567,33 @@
         };
 
         tr.innerHTML = `
-          <td class="p-2 text-left font-bold text-slate-900 border-r border-slate-200/60">${d.ddd}</td>
-          <td class="p-2 text-left text-slate-700 border-r border-slate-200/60">${d.regional}</td>
-          <td class="p-2 text-left font-bold text-slate-900 border-r border-slate-200/60">${d.coordenador}</td>
+          <td class="px-2 py-1.5 text-left font-bold text-slate-900 border-r border-slate-200/60 whitespace-nowrap">${d.ddd}</td>
+          <td class="px-2 py-1.5 text-left text-slate-700 border-r border-slate-200/60 whitespace-nowrap">${d.regional}</td>
+          <td class="px-2 py-1.5 text-left font-bold text-slate-900 border-r border-slate-200/60 whitespace-nowrap">${d.coordenador}</td>
           
-          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsP1, 30)}">${d.p1Real}</td>
-          <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsP1, 30)}">${d.ptsP1}</td>
+          <td class="px-1.5 py-1.5 border-r border-slate-200/60 whitespace-nowrap ${getCellClass(d.ptsP1, 30)}">${d.p1Real}</td>
+          <td class="px-1.5 py-1.5 font-bold border-r border-slate-200/60 whitespace-nowrap ${getCellClass(d.ptsP1, 30)}">${d.ptsP1}</td>
           
-          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsP2, 10)}">${d.p2Real}</td>
-          <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsP2, 10)}">${d.ptsP2}</td>
+          <td class="px-1.5 py-1.5 border-r border-slate-200/60 whitespace-nowrap ${getCellClass(d.ptsP2, 10)}">${d.p2Real}</td>
+          <td class="px-1.5 py-1.5 font-bold border-r border-slate-200/60 whitespace-nowrap ${getCellClass(d.ptsP2, 10)}">${d.ptsP2}</td>
           
-          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsExec, 5)}">${d.ncCorReal}</td>
-          <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsExec, 5)}">${d.ptsExec}</td>
+          <td class="px-1.5 py-1.5 border-r border-slate-200/60 whitespace-nowrap ${getCellClass(d.ptsExec, 5)}">${d.ncCorReal}</td>
+          <td class="px-1.5 py-1.5 font-bold border-r border-slate-200/60 whitespace-nowrap ${getCellClass(d.ptsExec, 5)}">${d.ptsExec}</td>
           
-          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsQual, 5)}">${d.prevQualReal}</td>
-          <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsQual, 5)}">${d.ptsQual}</td>
+          <td class="px-1.5 py-1.5 border-r border-slate-200/60 whitespace-nowrap ${getCellClass(d.ptsQual, 5)}">${d.prevQualReal}</td>
+          <td class="px-1.5 py-1.5 font-bold border-r border-slate-200/60 whitespace-nowrap ${getCellClass(d.ptsQual, 5)}">${d.ptsQual}</td>
           
-          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsFatB, 20)}">${d.faturaBReal}</td>
-          <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsFatB, 20)}">${d.ptsFatB}</td>
+          <td class="px-1.5 py-1.5 border-r border-slate-200/60 whitespace-nowrap ${getCellClass(d.ptsFatB, 20)}">${d.faturaBReal}</td>
+          <td class="px-1.5 py-1.5 font-bold border-r border-slate-200/60 whitespace-nowrap ${getCellClass(d.ptsFatB, 20)}">${d.ptsFatB}</td>
           
-          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsHESob, 30)}">${d.orcHE}</td>
-          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsHESob, 30)}">${d.gastoHE}</td>
-          <td class="p-2 border-r border-slate-200/60 ${getCellClass(d.ptsHESob, 30)}">${d.varHE}</td>
-          <td class="p-2 font-bold border-r border-slate-200/60 ${getCellClass(d.ptsHESob, 30)}">${d.ptsHESob}</td>
+          <td class="px-1.5 py-1.5 border-r border-slate-200/60 whitespace-nowrap ${getCellClass(d.ptsHESob, 30)}">${d.orcHE}</td>
+          <td class="px-1.5 py-1.5 border-r border-slate-200/60 whitespace-nowrap ${getCellClass(d.ptsHESob, 30)}">${d.gastoHE}</td>
+          <td class="px-1.5 py-1.5 border-r border-slate-200/60 whitespace-nowrap ${getCellClass(d.ptsHESob, 30)}">${d.varHE}</td>
+          <td class="px-1.5 py-1.5 font-bold border-r border-slate-200/60 whitespace-nowrap ${getCellClass(d.ptsHESob, 30)}">${d.ptsHESob}</td>
           
-          <td class="p-2 font-extrabold text-slate-900 bg-slate-100/90 text-sm border-r border-slate-200/60">${d.total.toFixed(0)}</td>
-          <td class="p-2 font-bold text-slate-700 border-r border-slate-200/60">${d.rankingDDD}º</td>
-          <td class="p-2"><span class="status-pill ${statusClass}"></span></td>
+          <td class="px-2 py-1.5 font-extrabold text-slate-900 bg-slate-100/90 text-xs border-r border-slate-200/60 whitespace-nowrap">${d.total.toFixed(0)}</td>
+          <td class="px-2 py-1.5 font-bold text-slate-700 border-r border-slate-200/60 whitespace-nowrap">${d.rankingDDD}º</td>
+          <td class="px-2 py-1.5 whitespace-nowrap"><span class="status-pill ${statusClass}"></span></td>
         `;
         tbody.appendChild(tr);
       });
