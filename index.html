@@ -68,30 +68,22 @@
         </div>
       </div>
 
-      <!-- Actions -->
-      <div class="flex items-center gap-3">
-        <select id="select-semana" onchange="filterBySemana()" class="bg-slate-800 border border-slate-700 text-sky-300 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
-          <!-- Injetado via JS -->
-        </select>
+      <!-- Actions & Base Atualizada -->
+      <div class="flex flex-col items-end gap-1.5">
+        <div class="flex items-center gap-3">
+          <select id="select-semana" onchange="filterBySemana()" class="bg-slate-800 border border-slate-700 text-sky-300 text-xs font-bold rounded-lg p-2 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            <!-- Injetado via JS -->
+          </select>
 
-        <button onclick="fetchGoogleSheetsData()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-sm flex items-center gap-1.5 transition">
-          <i class="fa-solid fa-rotate text-xs"></i> Sincronizar
-        </button>
-      </div>
-    </header>
-
-    <!-- BANNER INFORMATIVO -->
-    <div id="status-banner" class="bg-[#e6f7f2] border border-emerald-200/80 text-emerald-900 px-4 py-2 rounded-lg text-xs flex flex-wrap items-center justify-between gap-2 shadow-sm">
-      <div class="flex items-center gap-2">
-        <i class="fa-solid fa-circle-check text-emerald-600" id="status-icon"></i>
-        <span id="status-text">Conectando à Planilha do Google Sheets...</span>
-      </div>
-      <div class="flex items-center gap-3">
-        <span class="bg-[#fef3c7] border border-amber-200/80 text-amber-900 font-semibold px-2.5 py-0.5 rounded text-[11px]">
-          Diretriz: Pontuação por Desempenho
+          <button onclick="fetchGoogleSheetsData()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-sm flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-rotate text-xs" id="sync-icon"></i> Sincronizar
+          </button>
+        </div>
+        <span id="lbl-base-atualizada" class="text-[11px] font-medium text-emerald-400 tracking-wide">
+          Base atualizada: Carregando...
         </span>
       </div>
-    </div>
+    </header>
 
     <!-- BLOCO 1: PAINEL GERAL SPI (LARGURA TOTAL) -->
     <section class="bg-white rounded-xl border border-slate-200/90 shadow-sm overflow-hidden p-4">
@@ -351,38 +343,58 @@
 
     // CARREGAR E PROCESSAR DADOS DE DESEMPENHO
     function fetchGoogleSheetsData() {
-      const bannerText = document.getElementById('status-text');
-      const icon = document.getElementById('status-icon');
+      const lblAtualizada = document.getElementById('lbl-base-atualizada');
+      const syncIcon = document.getElementById('sync-icon');
       
-      icon.className = "fa-solid fa-circle-notch fa-spin text-emerald-600";
-      bannerText.innerText = "Sincronizando com a Planilha Google Sheets...";
+      syncIcon.classList.add('fa-spin');
+      lblAtualizada.className = "text-[11px] font-medium text-sky-300 tracking-wide";
+      lblAtualizada.innerText = "Base atualizada: Sincronizando...";
 
       Papa.parse(GOOGLE_SHEETS_CSV_URL, {
         download: true,
         header: true,
         skipEmptyLines: true,
         complete: function(results) {
+          syncIcon.classList.remove('fa-spin');
           if (results.data && results.data.length > 0) {
+            // Extrai o valor da célula Z2 (índice 25 da primeira linha de dados, ou cabeçalho correspondente)
+            const firstRow = results.data[0];
+            const keys = Object.keys(firstRow);
+            let valorZ2 = '';
+
+            // Coluna Z corresponde ao índice 25 (A=0 ... Z=25)
+            if (keys.length > 25 && firstRow[keys[25]]) {
+              valorZ2 = firstRow[keys[25]].toString().trim();
+            } else {
+              // Fallback caso a coluna tenha nome específico como "Atualização" ou "Base atualizada"
+              const keyAtualizacao = keys.find(k => k.toLowerCase().includes('atualiz'));
+              if (keyAtualizacao && firstRow[keyAtualizacao]) {
+                valorZ2 = firstRow[keyAtualizacao].toString().trim();
+              }
+            }
+
+            lblAtualizada.className = "text-[11px] font-medium text-emerald-400 tracking-wide";
+            lblAtualizada.innerText = valorZ2 ? `Base atualizada: ${valorZ2}` : `Base atualizada: --`;
+
             allRowsParsed = processRawRows(results.data);
             extractUltimas5Semanas();
             populateSemanaSelector();
             filterBySemana();
-            
-            icon.className = "fa-solid fa-circle-check text-emerald-600";
-            bannerText.innerHTML = `<strong>Sucesso:</strong> Base sincronizada com ${allRowsParsed.length} registros da Planilha Google!`;
           } else {
-            showError("Planilha retornou vazia ou sem estrutura de cabeçalhos.");
+            showError("Sem dados na planilha");
           }
         },
         error: function(err) {
-          showError("Erro ao conectar à Planilha Google. Verifique o link e permissões.");
+          syncIcon.classList.remove('fa-spin');
+          showError("Erro de conexão");
         }
       });
     }
 
     function showError(msg) {
-      document.getElementById('status-icon').className = "fa-solid fa-circle-exclamation text-rose-600";
-      document.getElementById('status-text').innerHTML = `<strong>Atenção:</strong> ${msg}`;
+      const lblAtualizada = document.getElementById('lbl-base-atualizada');
+      lblAtualizada.className = "text-[11px] font-medium text-rose-400 tracking-wide";
+      lblAtualizada.innerText = `Base atualizada: ${msg}`;
     }
 
     function processRawRows(rows) {
